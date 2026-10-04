@@ -69,7 +69,22 @@ function showGames() {
             platform.textContent = platformNames[game.platform];
         }
 
-        card.append(title, platform);
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            if (!confirm("Delete " + game.title + " and all its achievements?")) {
+                return;
+            }
+            const index = games.indexOf(game);
+            games.splice(index, 1);
+            showGames();
+            if (selectedGame === game) {
+                showAchievements(games[0]);
+            }
+        });
+
+        card.append(title, platform, deleteButton);
 
         card.addEventListener("click", () => {
             showAchievements(game);
@@ -81,16 +96,20 @@ function showGames() {
 
 showGames();
 
-
-
 const achievementList = document.querySelector("#achievement-list");
 const selectedGameTitle = document.querySelector("#selected-game-title");
 let selectedGame = games[0];
 
 function showAchievements(game) {
     selectedGame = game;
-    selectedGameTitle.textContent = game.title;
     achievementList.replaceChildren();
+
+    if (!game) {
+        selectedGameTitle.textContent = "No games yet";
+        return;
+    }
+
+    selectedGameTitle.textContent = game.title;
 
     for (const achievement of game.achievements) {
         const card = document.createElement("article");
@@ -181,6 +200,10 @@ const addAchievementForm = document.querySelector("#add-achievement-form");
 
 addAchievementForm.addEventListener("submit", (event) => {
     event.preventDefault();
+
+    if (!selectedGame) {
+        return;
+    }
 
     const newAchievement = {
         name: addAchievementForm.elements.name.value,
