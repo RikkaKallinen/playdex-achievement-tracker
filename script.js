@@ -85,8 +85,10 @@ showGames();
 
 const achievementList = document.querySelector("#achievement-list");
 const selectedGameTitle = document.querySelector("#selected-game-title");
+let selectedGame = games[0];
 
 function showAchievements(game) {
+    selectedGame = game;
     selectedGameTitle.textContent = game.title;
     achievementList.replaceChildren();
 
@@ -154,7 +156,6 @@ addGameForm.addEventListener("submit", (event) => {
     showGames();
     addGameForm.reset();
     updateOtherPlatformField();
-
 });
 
 const platformSelect = addGameForm.elements.platform;
@@ -167,3 +168,21 @@ function updateOtherPlatformField() {
 }
 
 platformSelect.addEventListener("change", updateOtherPlatformField);
+
+const addAchievementForm = document.querySelector("#add-achievement-form");
+
+addAchievementForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const newAchievement = {
+        name: addAchievementForm.elements.name.value,
+        description: addAchievementForm.elements.description.value,
+        earned: false,
+        earnedDate: null
+    };
+
+    selectedGame.achievements.push(newAchievement);
+    showAchievements(selectedGame);
+    addAchievementForm.reset();
+});
+
