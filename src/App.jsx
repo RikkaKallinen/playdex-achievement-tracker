@@ -1,3 +1,6 @@
+import { starterGames } from "./data";
+import GameCard from "./GameCard";
+
 function App() {
     return (
         <>
@@ -12,6 +15,9 @@ function App() {
 
                 <section>
                     <h2>See their games</h2>
+                    {starterGames.map((game) => (
+                        <GameCard key={game.title} game={game} />
+                    ))}
                 </section>
 
                 <section>
