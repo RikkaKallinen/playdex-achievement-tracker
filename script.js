@@ -4,7 +4,7 @@ const platformNames = {
     playstation: "PlayStation"
 };
 
-const games = [
+const starterGames = [
     {
         title: "Peak",
         platform: "steam",
@@ -50,6 +50,13 @@ const games = [
 
 ]
 
+const savedGames = localStorage.getItem("playdex-games");
+const games = savedGames ? JSON.parse(savedGames) : starterGames;
+
+function saveGames() {
+    localStorage.setItem("playdex-games", JSON.stringify(games));
+}
+
 const gameList = document.querySelector("#game-list");
 
 function showGames() {
@@ -78,6 +85,7 @@ function showGames() {
             }
             const index = games.indexOf(game);
             games.splice(index, 1);
+            saveGames();
             showGames();
             if (selectedGame === game) {
                 showAchievements(games[0]);
@@ -135,6 +143,7 @@ function showAchievements(game) {
             if (checkbox.checked && !achievement.earnedDate) {
                 achievement.earnedDate = new Date().toLocaleDateString("en-CA");
             }
+            saveGames();
             showAchievements(game);
         });
 
@@ -143,6 +152,7 @@ function showAchievements(game) {
         deleteButton.addEventListener("click", () => {
             const index = game.achievements.indexOf(achievement);
             game.achievements.splice(index, 1);
+            saveGames();
             showAchievements(game);
         });
 
@@ -180,6 +190,7 @@ addGameForm.addEventListener("submit", (event) => {
     };
 
     games.push(newGame);
+    saveGames();
     showGames();
     addGameForm.reset();
     updateOtherPlatformField();
@@ -213,6 +224,7 @@ addAchievementForm.addEventListener("submit", (event) => {
     };
 
     selectedGame.achievements.push(newAchievement);
+    saveGames();
     showAchievements(selectedGame);
     addAchievementForm.reset();
 });
