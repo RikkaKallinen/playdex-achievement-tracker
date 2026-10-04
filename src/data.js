@@ -6,6 +6,7 @@ export const platformNames = {
 
 export const starterGames = [
     {
+        id: "peak",
         title: "Peak",
         platform: "steam",
         achievements: [
@@ -30,6 +31,7 @@ export const starterGames = [
         ]
     },
     {
+        id: "stardew-valley",
         title: "Stardew Valley",
         platform: "steam",
         achievements: [

@@ -1,7 +1,11 @@
 import { starterGames } from "./data";
 import GameCard from "./GameCard";
+import { useState } from "react";
 
 function App() {
+    const [selectedGameId, setSelectedGameId] = useState(starterGames[0].id);
+    const selectedGame = starterGames.find((game) => game.id === selectedGameId);
+
     return (
         <>
             <header>
@@ -16,12 +20,16 @@ function App() {
                 <section>
                     <h2>See their games</h2>
                     {starterGames.map((game) => (
-                        <GameCard key={game.title} game={game} />
+                        <GameCard
+                            key={game.id}
+                            game={game}
+                            onSelect={() => setSelectedGameId(game.id)}
+                        />
                     ))}
                 </section>
 
                 <section>
-                    <h2>Achievements</h2>
+                    <h2>{selectedGame.title}</h2>
                 </section>
             </main>
         </>
