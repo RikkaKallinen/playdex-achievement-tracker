@@ -2,10 +2,10 @@ import { platformNames } from "./data";
 
 function GameCard({ game }) {
     const platformText = game.platform === "other"
-    ? "Other - " + game.otherPlatform
-    : platformNames[game.platform];
+        ? "Other - " + game.otherPlatform
+        : platformNames[game.platform];
 
-    return(
+    return (
         <article className="game-card">
             <h3>{game.title}</h3>
             <p>{platformText}</p>
