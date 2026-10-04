@@ -153,4 +153,17 @@ addGameForm.addEventListener("submit", (event) => {
     games.push(newGame);
     showGames();
     addGameForm.reset();
+    updateOtherPlatformField();
+
 });
+
+const platformSelect = addGameForm.elements.platform;
+const otherPlatformField = document.querySelector("#other-platform-field");
+
+function updateOtherPlatformField() {
+    const isOther = platformSelect.value === "other";
+    otherPlatformField.hidden = !isOther;
+    addGameForm.elements.otherPlatform.required = isOther;
+}
+
+platformSelect.addEventListener("change", updateOtherPlatformField);
