@@ -4,8 +4,34 @@ import { useState } from "react";
 import AchievementCard from "./AchievementCard";
 
 function App() {
+    const [games, setGames] = useState(starterGames);
     const [selectedGameId, setSelectedGameId] = useState(starterGames[0].id);
-    const selectedGame = starterGames.find((game) => game.id === selectedGameId);
+    const selectedGame = games.find((game) => game.id === selectedGameId);
+
+    function toggleAchievement(achievementName) {
+        setGames(games.map((game) => {
+            if (game.id !== selectedGameId) {
+                return game;
+            }
+
+            return {
+                ...game,
+                achievements: game.achievements.map((achievement) => {
+                    if (achievement.name !== achievementName) {
+                        return achievement;
+                    }
+
+                    const nowEarned = !achievement.earned;
+                    let earnedDate = achievement.earnedDate;
+                    if (nowEarned && !earnedDate) {
+                        earnedDate = new Date().toLocaleDateString("en-CA");
+                    }
+
+                    return { ...achievement, earned: nowEarned, earnedDate: earnedDate };
+                })
+            };
+        }));
+    }
 
     return (
         <>
@@ -20,7 +46,7 @@ function App() {
 
                 <section>
                     <h2>See their games</h2>
-                    {starterGames.map((game) => (
+                    {games.map((game) => (
                         <GameCard
                             key={game.id}
                             game={game}
@@ -32,7 +58,11 @@ function App() {
                 <section>
                     <h2>{selectedGame.title}</h2>
                     {selectedGame.achievements.map((achievement) => (
-                        <AchievementCard key={achievement.name} achievement={achievement} />
+                        <AchievementCard
+                            key={achievement.name}
+                            achievement={achievement}
+                            onToggle={() => toggleAchievement(achievement.name)}
+                        />
                     ))}
                 </section>
             </main>
