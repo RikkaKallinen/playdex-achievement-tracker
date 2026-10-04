@@ -119,7 +119,15 @@ function showAchievements(game) {
             showAchievements(game);
         });
 
-        card.append(name, description, label);
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => {
+            const index = game.achievements.indexOf(achievement);
+            game.achievements.splice(index, 1);
+            showAchievements(game);
+        });
+
+        card.append(name, description, label, deleteButton);
 
         if (achievement.earned) {
             const unlockedOn = document.createElement("p");
