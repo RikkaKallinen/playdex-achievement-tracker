@@ -1,6 +1,7 @@
 import { starterGames } from "./data";
 import GameCard from "./GameCard";
 import { useState } from "react";
+import AchievementCard from "./AchievementCard";
 
 function App() {
     const [selectedGameId, setSelectedGameId] = useState(starterGames[0].id);
@@ -30,6 +31,9 @@ function App() {
 
                 <section>
                     <h2>{selectedGame.title}</h2>
+                    {selectedGame.achievements.map((achievement) => (
+                        <AchievementCard key={achievement.name} achievement={achievement} />
+                    ))}
                 </section>
             </main>
         </>
