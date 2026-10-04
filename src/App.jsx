@@ -3,6 +3,7 @@ function App() {
         <>
             <header>
                 <h1>Playdex</h1>
+                <p>Track it. Log it. Beat it.</p>
             </header>
             <main>
                 <section>
