@@ -1,13 +1,61 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playdex</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+
+</head>
+<body>
+    <header>
+        <h1>Playdex</h1>
+        <p>Track it. Log it. Beat it.</p>
+    </header>
+    <main>
+
+        <section>
+            <h2>Add a game</h2>
+            <form id="add-game-form">
+                <label for="game-title">Game title</label>
+                <input type="text" id="game-title" name="title" required>
+
+                <label for="platform">Platform</label>
+                <select id="platform" name="platform">
+                    <option value="steam">Steam</option>
+                    <option value="xbox">Xbox</option>
+                    <option value="playstation">PlayStation</option>
+                    <option value="other">Other</option>
+                </select>
+                <div id="other-platform-field" hidden>
+                    <label for="other-platform">Platform name</label>
+                    <input type="text" id="other-platform" name="otherPlatform">
+                </div>
+
+                <button type="submit">Add game</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>See their games</h2>
+            <div id="game-list"></div>
+        </section>
+
+        <section>
+            <h2 id="selected-game-title">Add achievements to a game and check them off</h2>
+            <form id="add-achievement-form">
+                <label for="achievement-name">Achievement name</label>
+                <input type="text" id="'achievement-name" name="name" required>
+
+                <label for="achievement-description">Description</label>
+                <input type="text" id="achievement-description" name="description">
+
+                <button type="submit">Add achievement</button>
+            </form>
+            <div id="achievement-list"></div>
+        </section>
+
+    </main>
+</body>
 </html>
