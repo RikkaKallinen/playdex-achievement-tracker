@@ -1,14 +1,21 @@
 import { starterGames } from "./data";
 import GameCard from "./GameCard";
-import { useState } from "react";
 import AchievementCard from "./AchievementCard";
 import AddGameForm from "./AddGameForm";
 import AddAchievementForm from "./AddAchievementForm";
+import { useState, useEffect } from "react";
 
 function App() {
-    const [games, setGames] = useState(starterGames);
-    const [selectedGameId, setSelectedGameId] = useState(starterGames[0].id);
+    const [games, setGames] = useState(() => {
+        const savedGames = localStorage.getItem("playdex-games");
+        return savedGames ? JSON.parse(savedGames) : starterGames;
+    });
+    const [selectedGameId, setSelectedGameId] = useState(games[0].id);
     const selectedGame = games.find((game) => game.id === selectedGameId);
+
+    useEffect(() => {
+        localStorage.setItem("playdex-games", JSON.stringify(games));
+    }, [games]);
 
     function toggleAchievement(achievementName) {
         setGames(games.map((game) => {
