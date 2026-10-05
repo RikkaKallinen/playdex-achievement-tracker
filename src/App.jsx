@@ -3,6 +3,7 @@ import GameCard from "./GameCard";
 import { useState } from "react";
 import AchievementCard from "./AchievementCard";
 import AddGameForm from "./AddGameForm";
+import AddAchievementForm from "./AddAchievementForm";
 
 function App() {
     const [games, setGames] = useState(starterGames);
@@ -38,6 +39,16 @@ function App() {
         setGames([...games, newGame]);
     }
 
+    function addAchievement(newAchievement) {
+        setGames(games.map((game) => {
+            if (game.id !== selectedGameId) {
+                return game;
+            }
+
+            return { ...game, achievements: [...game.achievements, newAchievement] };
+        }));
+    }
+
     return (
         <>
             <header>
@@ -63,6 +74,7 @@ function App() {
 
                 <section>
                     <h2>{selectedGame.title}</h2>
+                    <AddAchievementForm onAddAchievement={addAchievement} />
                     {selectedGame.achievements.map((achievement) => (
                         <AchievementCard
                             key={achievement.name}
