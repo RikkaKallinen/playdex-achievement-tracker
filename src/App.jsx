@@ -2,6 +2,7 @@ import { starterGames } from "./data";
 import GameCard from "./GameCard";
 import { useState } from "react";
 import AchievementCard from "./AchievementCard";
+import AddGameForm from "./AddGameForm";
 
 function App() {
     const [games, setGames] = useState(starterGames);
@@ -33,6 +34,10 @@ function App() {
         }));
     }
 
+    function addGame(newGame) {
+        setGames([...games, newGame]);
+    }
+
     return (
         <>
             <header>
@@ -42,6 +47,7 @@ function App() {
             <main>
                 <section>
                     <h2>Add a game</h2>
+                    <AddGameForm onAddGame={addGame} />
                 </section>
 
                 <section>
