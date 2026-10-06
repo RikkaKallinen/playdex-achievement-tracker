@@ -1,25 +1,22 @@
 import { starterGames } from "./data";
-import GameCard from "./GameCard";
-import AchievementCard from "./AchievementCard";
-import AddGameForm from "./AddGameForm";
-import AddAchievementForm from "./AddAchievementForm";
 import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router";
+import GamesPage from "./GamesPage";
+import GamePage from "./GamePage";
 
 function App() {
     const [games, setGames] = useState(() => {
         const savedGames = localStorage.getItem("playdex-games");
         return savedGames ? JSON.parse(savedGames) : starterGames;
     });
-    const [selectedGameId, setSelectedGameId] = useState(games.length > 0 ? games[0].id : null);
-    const selectedGame = games.find((game) => game.id === selectedGameId);
 
     useEffect(() => {
         localStorage.setItem("playdex-games", JSON.stringify(games));
     }, [games]);
 
-    function toggleAchievement(achievementName) {
+    function toggleAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
-            if (game.id !== selectedGameId) {
+            if (game.id !== gameId) {
                 return game;
             }
 
@@ -46,9 +43,9 @@ function App() {
         setGames([...games, newGame]);
     }
 
-    function addAchievement(newAchievement) {
+    function addAchievement(gameId, newAchievement) {
         setGames(games.map((game) => {
-            if (game.id !== selectedGameId) {
+            if (game.id !== gameId) {
                 return game;
             }
 
@@ -57,21 +54,16 @@ function App() {
     }
 
     function deleteGame(gameToDelete) {
-        if(!confirm("Delete " + gameToDelete.title + " and all its achievements?")) {
+        if (!confirm("Delete " + gameToDelete.title + " and all its achievements?")) {
             return;
         }
 
-        const remainingGames = games.filter((game) => game.id !== gameToDelete.id);
-        setGames(remainingGames);
-
-        if (selectedGameId === gameToDelete.id) {
-            setSelectedGameId(remainingGames.length > 0 ? remainingGames[0].id : null);
-        }
+        setGames(games.filter((game) => game.id !== gameToDelete.id));
     }
 
-    function deleteAchievement(achievementName) {
+    function deleteAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
-            if(game.id !== selectedGameId) {
+            if (game.id !== gameId) {
                 return game;
             }
 
@@ -89,38 +81,29 @@ function App() {
                 <p>Track it. Log it. Beat it.</p>
             </header>
             <main>
-                <section>
-                    <h2>Add a game</h2>
-                    <AddGameForm onAddGame={addGame} />
-                </section>
-
-                <section>
-                    <h2>See their games</h2>
-                    {games.length === 0 && <p>No games yet</p>}
-                    {games.map((game) => (
-                        <GameCard
-                            key={game.id}
-                            game={game}
-                            onSelect={() => setSelectedGameId(game.id)}
-                            onDelete={() => deleteGame(game)}
-                        />
-                    ))}
-                </section>
-
-                {selectedGame && (
-                    <section>
-                        <h2>{selectedGame.title}</h2>
-                        <AddAchievementForm onAddAchievement={addAchievement} />
-                        {selectedGame.achievements.map((achievement) => (
-                            <AchievementCard
-                                key={achievement.name}
-                                achievement={achievement}
-                                onToggle={() => toggleAchievement(achievement.name)}
-                                onDelete={() => deleteAchievement(achievement.name)}
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            <GamesPage
+                                games={games}
+                                onAddGame={addGame}
+                                onDeleteGame={deleteGame}
                             />
-                        ))}
-                    </section>
-                )}
+                        }
+                    />
+                    <Route
+                        path="/games/:gameId"
+                        element={
+                            <GamePage
+                                games={games}
+                                onAddAchievement={addAchievement}
+                                onToggleAchievement={toggleAchievement}
+                                onDeleteAchievement={deleteAchievement}
+                            />
+                        }
+                    />
+                </Routes>
             </main>
         </>
     );
