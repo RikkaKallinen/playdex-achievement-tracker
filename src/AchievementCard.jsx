@@ -1,4 +1,4 @@
-function AchievementCard({ achievement, onToggle }) {
+function AchievementCard({ achievement, onToggle, onDelete }) {
     const cardClass = achievement.earned
         ? "achievement-card unlocked"
         : "achievement-card";
@@ -19,6 +19,7 @@ function AchievementCard({ achievement, onToggle }) {
                 <input type="checkbox" checked={achievement.earned} onChange={onToggle} />
                 {" "}Unlocked
             </label>
+            <button onClick={onDelete}>Delete</button>
             {achievement.earned && (
                 <p>
                     Unlocked on <time dateTime={achievement.earnedDate}>{formattedDate}</time>

@@ -10,7 +10,7 @@ function App() {
         const savedGames = localStorage.getItem("playdex-games");
         return savedGames ? JSON.parse(savedGames) : starterGames;
     });
-    const [selectedGameId, setSelectedGameId] = useState(games[0].id);
+    const [selectedGameId, setSelectedGameId] = useState(games.length > 0 ? games[0].id : null);
     const selectedGame = games.find((game) => game.id === selectedGameId);
 
     useEffect(() => {
@@ -56,6 +56,32 @@ function App() {
         }));
     }
 
+    function deleteGame(gameToDelete) {
+        if(!confirm("Delete " + gameToDelete.title + " and all its achievements?")) {
+            return;
+        }
+
+        const remainingGames = games.filter((game) => game.id !== gameToDelete.id);
+        setGames(remainingGames);
+
+        if (selectedGameId === gameToDelete.id) {
+            setSelectedGameId(remainingGames.length > 0 ? remainingGames[0].id : null);
+        }
+    }
+
+    function deleteAchievement(achievementName) {
+        setGames(games.map((game) => {
+            if(game.id !== selectedGameId) {
+                return game;
+            }
+
+            return {
+                ...game,
+                achievements: game.achievements.filter((achievement) => achievement.name !== achievementName)
+            };
+        }));
+    }
+
     return (
         <>
             <header>
@@ -70,26 +96,31 @@ function App() {
 
                 <section>
                     <h2>See their games</h2>
+                    {games.length === 0 && <p>No games yet</p>}
                     {games.map((game) => (
                         <GameCard
                             key={game.id}
                             game={game}
                             onSelect={() => setSelectedGameId(game.id)}
+                            onDelete={() => deleteGame(game)}
                         />
                     ))}
                 </section>
 
-                <section>
-                    <h2>{selectedGame.title}</h2>
-                    <AddAchievementForm onAddAchievement={addAchievement} />
-                    {selectedGame.achievements.map((achievement) => (
-                        <AchievementCard
-                            key={achievement.name}
-                            achievement={achievement}
-                            onToggle={() => toggleAchievement(achievement.name)}
-                        />
-                    ))}
-                </section>
+                {selectedGame && (
+                    <section>
+                        <h2>{selectedGame.title}</h2>
+                        <AddAchievementForm onAddAchievement={addAchievement} />
+                        {selectedGame.achievements.map((achievement) => (
+                            <AchievementCard
+                                key={achievement.name}
+                                achievement={achievement}
+                                onToggle={() => toggleAchievement(achievement.name)}
+                                onDelete={() => deleteAchievement(achievement.name)}
+                            />
+                        ))}
+                    </section>
+                )}
             </main>
         </>
     );

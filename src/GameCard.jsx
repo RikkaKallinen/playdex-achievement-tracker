@@ -1,6 +1,6 @@
 import { platformNames } from "./data";
 
-function GameCard({ game, onSelect }) {
+function GameCard({ game, onSelect, onDelete }) {
     const platformText = game.platform === "other"
         ? "Other - " + game.otherPlatform
         : platformNames[game.platform];
@@ -9,6 +9,14 @@ function GameCard({ game, onSelect }) {
         <article className="game-card" onClick={onSelect}>
             <h3>{game.title}</h3>
             <p>{platformText}</p>
+            <button
+                onClick={(event) => {
+                    event.stopPropagation();
+                    onDelete();
+                }}
+            >
+                Delete
+            </button>
         </article>
     );
 }
