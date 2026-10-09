@@ -1,12 +1,7 @@
+import { getGoalStatus } from "./goalStatus";
+
 function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
-    const game = games.find((game) => game.id === goal.gameId);
-
-    const achievement = goal.type === "achievement" && game
-        ? game.achievements.find((achievement) => achievement.name === goal.achievementName)
-        : null;
-
-    const completed = achievement ? achievement.earned : goal.completed;
-    const completedDate = achievement ? achievement.earnedDate : goal.completedDate;
+    const { game, completed, completedDate } = getGoalStatus(goal, games);
 
     const cardClass = completed
         ? "goal-card completed"
