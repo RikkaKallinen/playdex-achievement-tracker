@@ -28,3 +28,7 @@ form button {
 .achievement-card.unlocked {
     border-color: green;
 }
+
+.goal-card.completed {
+    border-color: green;
+}

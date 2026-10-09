@@ -88,6 +88,25 @@ function App() {
         setGoals([...goals, newGoal]);
     }
 
+    function toggleGoal(goalId) {
+        setGoals(goals.map((goal) => {
+            if (goal.id !== goalId) {
+                return goal;
+            }
+
+            const nowCompleted = !goal.completed;
+            const completedDate = nowCompleted
+                ? new Date().toLocaleDateString("en-CA")
+                : null;
+
+            return { ...goal, completed: nowCompleted, completedDate: completedDate };
+        }));
+    }
+
+    function deleteGoal(goalId) {
+        setGoals(goals.filter((goal) => goal.id !== goalId));
+    }
+
     return (
         <>
             <header>
@@ -129,6 +148,8 @@ function App() {
                                 goals={goals}
                                 games={games}
                                 onAddGoal={addGoal}
+                                onToggleGoal={toggleGoal}
+                                onDeleteGoal={deleteGoal}
                             />
                         }
                     />

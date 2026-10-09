@@ -1,7 +1,7 @@
 import AddGoalForm from "./AddGoalForm";
 import GoalCard from "./GoalCard";
 
-function GoalsPage({ goals, games, onAddGoal }) {
+function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal }) {
     return (
         <>
             <section>
@@ -13,7 +13,13 @@ function GoalsPage({ goals, games, onAddGoal }) {
                 <h2>Goals</h2>
                 {goals.length === 0 && <p>No goals yet</p>}
                 {goals.map((goal) => (
-                    <GoalCard key={goal.id} goal={goal} games={games} />
+                    <GoalCard
+                        key={goal.id}
+                        goal={goal}
+                        games={games}
+                        onToggle={() => onToggleGoal(goal.id)}
+                        onDelete={() => onDeleteGoal(goal.id)}
+                    />
                 ))}
             </section>
         </>
