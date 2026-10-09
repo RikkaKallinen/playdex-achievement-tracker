@@ -1,12 +1,19 @@
 function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
     const game = games.find((game) => game.id === goal.gameId);
 
-    const cardClass = goal.completed
+    const achievement = goal.type === "achievement" && game
+        ? game.achievements.find((achievement) => achievement.name === goal.achievementName)
+        : null;
+
+    const completed = achievement ? achievement.earned : goal.completed;
+    const completedDate = achievement ? achievement.earnedDate : goal.completedDate;
+
+    const cardClass = completed
         ? "goal-card completed"
         : "goal-card";
 
-    const formattedDate = goal.completed
-        ? new Date(goal.completedDate + "T00:00").toLocaleDateString("en-US", {
+    const formattedDate = completed
+        ? new Date(completedDate + "T00:00").toLocaleDateString("en-US", {
             month: "long",
             day: "numeric",
             year: "numeric"
@@ -34,14 +41,14 @@ function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
                 </>
             ) : (
                 <label>
-                    <input type="checkbox" checked={goal.completed} onChange={onToggle} />
+                    <input type="checkbox" checked={completed} onChange={onToggle} />
                     {" "}Completed
                 </label>
             )}
             <button onClick={onDelete}>Delete</button>
-            {goal.completed && (
+            {completed && (
                 <p>
-                    Completed on <time dateTime={goal.completedDate}>{formattedDate}</time>
+                    Completed on <time dateTime={completedDate}>{formattedDate}</time>
                 </p>
             )}
         </article>

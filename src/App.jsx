@@ -89,6 +89,12 @@ function App() {
     }
 
     function toggleGoal(goalId) {
+        const goalToToggle = goals.find((goal) => goal.id === goalId);
+        if (goalToToggle.type === "achievement") {
+            toggleAchievement(goalToToggle.gameId, goalToToggle.achievementName);
+            return;
+        }
+
         setGoals(goals.map((goal) => {
             if (goal.id !== goalId) {
                 return goal;
