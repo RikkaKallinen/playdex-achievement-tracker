@@ -4,6 +4,7 @@ import { Routes, Route, Link } from "react-router";
 import GoalsPage from "./GoalsPage";
 import GamesPage from "./GamesPage";
 import GamePage from "./GamePage";
+import SessionPage from "./SessionPage";
 
 function App() {
     const [games, setGames] = useState(() => {
@@ -23,6 +24,16 @@ function App() {
     useEffect(() => {
         localStorage.setItem("playdex-goals", JSON.stringify(goals));
     }, [goals]);
+
+    const [sessions, setSessions] = useState(() => {
+        const savedSessions = localStorage.getItem("playdex-sessions");
+        return savedSessions ? JSON.parse(savedSessions) : [];
+    });
+    const activeSession = sessions.find((session) => !session.ended);
+
+    useEffect(() => {
+        localStorage.setItem("playdex-sessions", JSON.stringify(sessions));
+    }, [sessions]);
 
     function toggleAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
@@ -131,6 +142,26 @@ function App() {
         }));
     }
 
+    function startSession(goalIds) {
+        setSessions([...sessions, {
+            id: crypto.randomUUID(),
+            startedDate: new Date().toLocaleDateString("en-CA"),
+            goalIds: goalIds,
+            ended: false,
+            endedDate: null
+        }]);
+    }
+
+    function endSession() {
+        setSessions(sessions.map((session) => {
+            if (session.id !== activeSession.id) {
+                return session;
+            }
+
+            return { ...session, ended: true, endedDate: new Date().toLocaleDateString("en-CA") };
+        }));
+    }
+
     return (
         <>
             <header>
@@ -140,6 +171,8 @@ function App() {
                     <Link to="/">Games</Link>
                     {" "}
                     <Link to="/goals">Goals</Link>
+                    {" "}
+                    <Link to="/session">Session</Link>
                 </nav>
             </header>
             <main>
@@ -172,6 +205,21 @@ function App() {
                                 goals={goals}
                                 games={games}
                                 onAddGoal={addGoal}
+                                onToggleGoal={toggleGoal}
+                                onDeleteGoal={deleteGoal}
+                                onUpdateGoalProgress={updateGoalProgress}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/session"
+                        element={
+                            <SessionPage
+                                goals={goals}
+                                games={games}
+                                activeSession={activeSession}
+                                onStartSession={startSession}
+                                onEndSession={endSession}
                                 onToggleGoal={toggleGoal}
                                 onDeleteGoal={deleteGoal}
                                 onUpdateGoalProgress={updateGoalProgress}
