@@ -10,6 +10,7 @@ function AddAchievementForm({ onAddAchievement }) {
         onAddAchievement({
             name: name,
             description: description,
+            source: "manual",
             earned: false,
             earnedDate: null
         });

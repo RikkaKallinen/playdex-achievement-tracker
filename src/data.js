@@ -13,18 +13,21 @@ export const starterGames = [
             {
                 name: "Beachcomber Badge",
                 description: "Climb past the SHORE",
+                source: "manual",
                 earned: true,
                 earnedDate: "2025-06-23"
             },
             {
                 name: "Trailblazer",
                 description: "Climb past the TROPICS",
+                source: "manual",
                 earned: true,
                 earnedDate: "2025-06-23"
             },
             {
                 name: "Alpinist Badge",
                 description: "Climb past the ALPINE",
+                source: "manual",
                 earned: true,
                 earnedDate: "2025-06-23"
             }
@@ -38,12 +41,14 @@ export const starterGames = [
             {
                 name: "Two Thumbs Up",
                 description: "See a movie",
+                source: "manual",
                 earned: true,
                 earnedDate: "2025-01-12"
             },
             {
                 name: "Living Large",
                 description: "Upgrade your house to the maximum size",
+                source: "manual",
                 earned: true,
                 earnedDate: "2025-01-05"
             }
