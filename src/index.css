@@ -39,3 +39,53 @@ textarea {
     width: 100%;
     margin-top: 4px;
 }
+
+.filter-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.filter-dropdown summary {
+    cursor: pointer;
+    list-style: none;
+    border: 1px solid black;
+    border-radius: 8px;
+    padding: 4px 12px;
+}
+
+.filter-dropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+.filter-dropdown ul {
+    position: absolute;
+    z-index: 1;
+    min-width: 220px;
+    margin: 4px 0 0;
+    padding: 4px 0;
+    list-style: none;
+    background: white;
+    border: 1px solid black;
+    border-radius: 8px;
+}
+
+.filter-dropdown li button {
+    display: block;
+    width: 100%;
+    padding: 4px 12px;
+    text-align: left;
+    font: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.filter-dropdown li button:hover {
+    background: #eee;
+}
+
+.check {
+    display: inline-block;
+    width: 1.5em;
+}

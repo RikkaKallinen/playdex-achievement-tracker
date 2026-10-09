@@ -1,13 +1,39 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router";
 import AchievementCard from "./AchievementCard";
 import AddAchievementForm from "./AddAchievementForm";
 import AddJournalEntryForm from "./AddJournalEntryForm";
 import TimelineItem from "./TimelineItem";
+import FilterDropdown from "./FilterDropdown";
 import { getGoalStatus } from "./goalStatus";
+
+const filterOptions = [
+    { type: "entry", label: "Journal entries" },
+    { type: "achievement", label: "Achievements" },
+    { type: "goal", label: "Goals" },
+    { type: "summary", label: "Session summaries" }
+];
 
 function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onAddJournalEntry, onDeleteJournalEntry }) {
     const { gameId } = useParams();
     const game = games.find((game) => game.id === gameId);
+    const [shownTypes, setShownTypes] = useState(filterOptions.map((option) => option.type));
+
+    function toggleShownType(type) {
+        if (shownTypes.includes(type)) {
+            setShownTypes(shownTypes.filter((shownType) => shownType !== type));
+        } else {
+            setShownTypes([...shownTypes, type]);
+        }
+    }
+
+    function toggleAllShownTypes() {
+        if (shownTypes.length === filterOptions.length) {
+            setShownTypes([]);
+        } else {
+            setShownTypes(filterOptions.map((option) => option.type));
+        }
+    }
 
     if (!game) {
         return (
@@ -63,6 +89,8 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
             )
     ].sort((a, b) => b.date.localeCompare(a.date));
 
+    const shownItems = timelineItems.filter((item) => shownTypes.includes(item.type));
+
     return (
         <>
             <section>
@@ -87,7 +115,7 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                     onAddEntry={(newEntry) => onAddJournalEntry(game.id, newEntry)}
                 />
 
-                {inProgressGoals.length > 0 && (
+                {shownTypes.includes("goal") && inProgressGoals.length > 0 && (
                     <>
                         <h3>In progress</h3>
                         {inProgressGoals.map((goal) => (
@@ -100,8 +128,15 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                 )}
 
                 <h3>Timeline</h3>
+                <FilterDropdown
+                    options={filterOptions}
+                    shownTypes={shownTypes}
+                    onToggle={toggleShownType}
+                    onToggleAll={toggleAllShownTypes}
+                />
                 {timelineItems.length === 0 && <p>Nothing in the timeline yet</p>}
-                {timelineItems.map((item) => (
+                {timelineItems.length > 0 && shownItems.length === 0 && <p>Nothing matches these filters</p>}
+                {shownItems.map((item) => (
                     <TimelineItem
                         key={item.key}
                         item={item}
