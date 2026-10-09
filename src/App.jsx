@@ -30,6 +30,8 @@ function App() {
         return savedSessions ? JSON.parse(savedSessions) : [];
     });
     const activeSession = sessions.find((session) => !session.ended);
+    const endedSessions = sessions.filter((session) => session.ended);
+    const lastKeptGoalIds = endedSessions.length > 0 ? endedSessions[endedSessions.length - 1].keptGoalIds || [] : [];
 
     useEffect(() => {
         localStorage.setItem("playdex-sessions", JSON.stringify(sessions));
@@ -152,13 +154,19 @@ function App() {
         }]);
     }
 
-    function endSession() {
+    function endSession(keptGoalIds, summaries) {
         setSessions(sessions.map((session) => {
             if (session.id !== activeSession.id) {
                 return session;
             }
 
-            return { ...session, ended: true, endedDate: new Date().toLocaleDateString("en-CA") };
+            return {
+                ...session,
+                ended: true,
+                endedDate: new Date().toLocaleDateString("en-CA"),
+                keptGoalIds: keptGoalIds,
+                summaries: summaries
+            };
         }));
     }
 
@@ -218,6 +226,7 @@ function App() {
                                 goals={goals}
                                 games={games}
                                 activeSession={activeSession}
+                                lastKeptGoalIds={lastKeptGoalIds}
                                 onStartSession={startSession}
                                 onEndSession={endSession}
                                 onToggleGoal={toggleGoal}
