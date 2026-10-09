@@ -1,7 +1,7 @@
 import AddGoalForm from "./AddGoalForm";
 import GoalCard from "./GoalCard";
 
-function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal }) {
+function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpdateGoalProgress }) {
     return (
         <>
             <section>
@@ -19,6 +19,7 @@ function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal }) {
                         games={games}
                         onToggle={() => onToggleGoal(goal.id)}
                         onDelete={() => onDeleteGoal(goal.id)}
+                        onProgressChange={(newProgress) => onUpdateGoalProgress(goal.id, newProgress)}
                     />
                 ))}
             </section>

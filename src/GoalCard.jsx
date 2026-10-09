@@ -1,4 +1,4 @@
-function GoalCard({ goal, games, onToggle, onDelete }) {
+function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
     const game = games.find((game) => game.id === goal.gameId);
 
     const cardClass = goal.completed
@@ -17,10 +17,27 @@ function GoalCard({ goal, games, onToggle, onDelete }) {
         <article className={cardClass}>
             <h3>{goal.text}</h3>
             {game && <p>{game.title}</p>}
-            <label>
-                <input type="checkbox" checked={goal.completed} onChange={onToggle} />
-                {" "}Completed
-            </label>
+            {goal.target ? (
+                <>
+                    <label>
+                        Progress{" "}
+                        <input
+                            type="number"
+                            min="0"
+                            max={goal.target}
+                            value={goal.progress}
+                            onChange={(event) => onProgressChange(Number(event.target.value))}
+                        />
+                        {" "}/ {goal.target}
+                    </label>
+                    <progress value={goal.progress} max={goal.target} />
+                </>
+            ) : (
+                <label>
+                    <input type="checkbox" checked={goal.completed} onChange={onToggle} />
+                    {" "}Completed
+                </label>
+            )}
             <button onClick={onDelete}>Delete</button>
             {goal.completed && (
                 <p>

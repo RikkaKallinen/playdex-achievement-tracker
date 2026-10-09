@@ -107,6 +107,24 @@ function App() {
         setGoals(goals.filter((goal) => goal.id !== goalId));
     }
 
+    function updateGoalProgress(goalId, newProgress) {
+        setGoals(goals.map((goal) => {
+            if (goal.id !== goalId) {
+                return goal;
+            }
+
+            const nowCompleted = newProgress >= goal.target;
+            let completedDate = null;
+            if (nowCompleted) {
+                completedDate = goal.completed
+                    ? goal.completedDate
+                    : new Date().toLocaleDateString("en-CA");
+            }
+
+            return { ...goal, progress: newProgress, completed: nowCompleted, completedDate: completedDate };
+        }));
+    }
+
     return (
         <>
             <header>
@@ -150,6 +168,7 @@ function App() {
                                 onAddGoal={addGoal}
                                 onToggleGoal={toggleGoal}
                                 onDeleteGoal={deleteGoal}
+                                onUpdateGoalProgress={updateGoalProgress}
                             />
                         }
                     />
