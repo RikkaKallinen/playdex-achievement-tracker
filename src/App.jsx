@@ -220,6 +220,8 @@ function App() {
                                 onAddAchievement={addAchievement}
                                 onToggleAchievement={toggleAchievement}
                                 onDeleteAchievement={deleteAchievement}
+                                goals={goals}
+                                sessions={sessions}
                                 journalEntries={journalEntries}
                                 onAddJournalEntry={addJournalEntry}
                                 onDeleteJournalEntry={deleteJournalEntry}
