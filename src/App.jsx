@@ -37,6 +37,15 @@ function App() {
         localStorage.setItem("playdex-sessions", JSON.stringify(sessions));
     }, [sessions]);
 
+    const [journalEntries, setJournalEntries] = useState(() => {
+        const savedEntries = localStorage.getItem("playdex-journal");
+        return savedEntries ? JSON.parse(savedEntries) : [];
+    });
+
+    useEffect(() => {
+        localStorage.setItem("playdex-journal", JSON.stringify(journalEntries));
+    }, [journalEntries]);
+
     function toggleAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
             if (game.id !== gameId) {
@@ -170,6 +179,14 @@ function App() {
         }));
     }
 
+    function addJournalEntry(gameId, newEntry) {
+        setJournalEntries([...journalEntries, { ...newEntry, gameId: gameId }]);
+    }
+
+    function deleteJournalEntry(entryId) {
+        setJournalEntries(journalEntries.filter((entry) => entry.id !== entryId));
+    }
+
     return (
         <>
             <header>
@@ -203,6 +220,9 @@ function App() {
                                 onAddAchievement={addAchievement}
                                 onToggleAchievement={toggleAchievement}
                                 onDeleteAchievement={deleteAchievement}
+                                journalEntries={journalEntries}
+                                onAddJournalEntry={addJournalEntry}
+                                onDeleteJournalEntry={deleteJournalEntry}
                             />
                         }
                     />

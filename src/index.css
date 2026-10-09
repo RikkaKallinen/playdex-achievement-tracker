@@ -9,7 +9,8 @@ body {
 
 .game-card,
 .achievement-card,
-.goal-card {
+.goal-card,
+.journal-entry {
     /* Shared rules */
     border: 1px solid black;
     padding: 16px;
