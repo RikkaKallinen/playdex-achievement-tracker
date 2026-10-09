@@ -1,6 +1,7 @@
 import { starterGames } from "./data";
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router";
+import { Routes, Route, Link } from "react-router";
+import GoalsPage from "./GoalsPage";
 import GamesPage from "./GamesPage";
 import GamePage from "./GamePage";
 
@@ -13,6 +14,15 @@ function App() {
     useEffect(() => {
         localStorage.setItem("playdex-games", JSON.stringify(games));
     }, [games]);
+
+    const [goals, setGoals] = useState(() => {
+        const savedGoals = localStorage.getItem("playdex-goals");
+        return savedGoals ? JSON.parse(savedGoals) : [];
+    });
+
+    useEffect(() => {
+        localStorage.setItem("playdex-goals", JSON.stringify(goals));
+    }, [goals]);
 
     function toggleAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
@@ -74,11 +84,20 @@ function App() {
         }));
     }
 
+    function addGoal(newGoal) {
+        setGoals([...goals, newGoal]);
+    }
+
     return (
         <>
             <header>
                 <h1>Playdex</h1>
                 <p>Track it. Log it. Beat it.</p>
+                <nav>
+                    <Link to="/">Games</Link>
+                    {" "}
+                    <Link to="/goals">Goals</Link>
+                </nav>
             </header>
             <main>
                 <Routes>
@@ -100,6 +119,16 @@ function App() {
                                 onAddAchievement={addAchievement}
                                 onToggleAchievement={toggleAchievement}
                                 onDeleteAchievement={deleteAchievement}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/goals"
+                        element={
+                            <GoalsPage
+                                goals={goals}
+                                games={games}
+                                onAddGoal={addGoal}
                             />
                         }
                     />
