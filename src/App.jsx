@@ -5,6 +5,7 @@ import GoalsPage from "./GoalsPage";
 import GamesPage from "./GamesPage";
 import GamePage from "./GamePage";
 import SessionPage from "./SessionPage";
+import SummaryPage from "./SummaryPage";
 
 function App() {
     const [games, setGames] = useState(() => {
@@ -198,6 +199,8 @@ function App() {
                     <Link to="/goals">Goals</Link>
                     {" "}
                     <Link to="/session">Session</Link>
+                    {" "}
+                    <Link to="/summary">Summary</Link>
                 </nav>
             </header>
             <main>
@@ -256,6 +259,10 @@ function App() {
                                 onUpdateGoalProgress={updateGoalProgress}
                             />
                         }
+                    />
+                    <Route
+                        path="/summary"
+                        element={<SummaryPage games={games} />}
                     />
                 </Routes>
             </main>
