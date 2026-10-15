@@ -1,4 +1,4 @@
-import { platformNames } from "./data";
+import { platformNames, trophyTiers } from "./data";
 
 function countAchievements(games) {
     const achievements = games.flatMap((game) => game.achievements);
@@ -7,6 +7,28 @@ function countAchievements(games) {
         unlocked: achievements.filter((achievement) => achievement.earned).length,
         total: achievements.length
     };
+}
+
+function countGamerscore(games) {
+    const achievements = games.flatMap((game) => game.achievements);
+    const earnedAchievements = achievements.filter((achievement) => achievement.earned);
+
+    return {
+        earned: earnedAchievements.reduce((sum, achievement) => sum + (achievement.gamerscore || 0), 0),
+        total: achievements.reduce((sum, achievement) => sum + (achievement.gamerscore || 0), 0)
+    };
+}
+
+function countTrophies(games) {
+    const earnedAchievements = games
+        .flatMap((game) => game.achievements)
+        .filter((achievement) => achievement.earned);
+
+    return Object.keys(trophyTiers).map((tier) => ({
+        tier: tier,
+        name: trophyTiers[tier],
+        count: earnedAchievements.filter((achievement) => achievement.trophyTier === tier).length
+    }));
 }
 
 function SummaryPage({ games }) {
@@ -30,6 +52,8 @@ function SummaryPage({ games }) {
 
             {platformSections.map((section) => {
                 const counts = countAchievements(section.games);
+                const gamerscore = countGamerscore(section.games);
+                const trophies = countTrophies(section.games);
 
                 return (
                     <section key={section.platform}>
@@ -39,6 +63,12 @@ function SummaryPage({ games }) {
                             {" · "}
                             {counts.unlocked} of {counts.total} achievements unlocked
                         </p>
+                        {section.platform === "xbox" && (
+                            <p>Gamerscore: {gamerscore.earned} of {gamerscore.total}</p>
+                        )}
+                        {section.platform === "playstation" && (
+                            <p>Trophies: {trophies.map((trophy) => trophy.name + " " + trophy.count).join(" · ")}</p>
+                        )}
                     </section>
                 );
             })}

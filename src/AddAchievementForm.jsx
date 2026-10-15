@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { trophyTiers } from "./data";
 
-function AddAchievementForm({ onAddAchievement }) {
+function AddAchievementForm({ platform, onAddAchievement }) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    const [gamerscore, setGamerscore] = useState("");
+    const [trophyTier, setTrophyTier] = useState("bronze");
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -11,12 +14,16 @@ function AddAchievementForm({ onAddAchievement }) {
             name: name,
             description: description,
             source: "manual",
+            gamerscore: platform === "xbox" ? Number(gamerscore) : null,
+            trophyTier: platform === "playstation" ? trophyTier : null,
             earned: false,
             earnedDate: null
         });
 
         setName("");
         setDescription("");
+        setGamerscore("");
+        setTrophyTier("bronze");
     }
 
     return (
@@ -37,6 +44,35 @@ function AddAchievementForm({ onAddAchievement }) {
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
             />
+
+            {platform === "xbox" && (
+                <>
+                    <label htmlFor="achievement-gamerscore">Gamerscore</label>
+                    <input
+                        type="number"
+                        id="achievement-gamerscore"
+                        min="0"
+                        value={gamerscore}
+                        onChange={(event) => setGamerscore(event.target.value)}
+                        required
+                    />
+                </>
+            )}
+
+            {platform === "playstation" && (
+                <>
+                    <label htmlFor="achievement-trophy">Trophy tier</label>
+                    <select
+                        id="achievement-trophy"
+                        value={trophyTier}
+                        onChange={(event) => setTrophyTier(event.target.value)}
+                    >
+                        {Object.keys(trophyTiers).map((tier) => (
+                            <option key={tier} value={tier}>{trophyTiers[tier]}</option>
+                        ))}
+                    </select>
+                </>
+            )}
 
             <button type="submit">Add achievement</button>
         </form>

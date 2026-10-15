@@ -97,6 +97,7 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                 <Link to="/">Back to games</Link>
                 <h2>{game.title}</h2>
                 <AddAchievementForm
+                    platform={game.platform}
                     onAddAchievement={(newAchievement) => onAddAchievement(game.id, newAchievement)}
                 />
                 {game.achievements.map((achievement) => (

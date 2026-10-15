@@ -4,6 +4,13 @@ export const platformNames = {
     playstation: "PlayStation"
 };
 
+export const trophyTiers = {
+    platinum: "Platinum",
+    gold: "Gold",
+    silver: "Silver",
+    bronze: "Bronze"
+};
+
 export const starterGames = [
     {
         id: "peak",
