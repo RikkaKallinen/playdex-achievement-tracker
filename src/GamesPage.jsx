@@ -2,8 +2,11 @@ import { useNavigate } from "react-router";
 import AddGameForm from "./AddGameForm";
 import GameCard from "./GameCard";
 
-function GamesPage({ games, onAddGame, onDeleteGame }) {
+function GamesPage({ games, onAddGame, onDeleteGame, onRestoreGame }) {
     const navigate = useNavigate();
+
+    const activeGames = games.filter((game) => !game.deleted);
+    const deletedGames = games.filter((game) => game.deleted);
 
     return (
         <>
@@ -14,8 +17,8 @@ function GamesPage({ games, onAddGame, onDeleteGame }) {
 
             <section>
                 <h2>See their games</h2>
-                {games.length === 0 && <p>No games yet</p>}
-                {games.map((game) => (
+                {activeGames.length === 0 && <p>No games yet</p>}
+                {activeGames.map((game) => (
                     <GameCard
                         key={game.id}
                         game={game}
@@ -24,6 +27,18 @@ function GamesPage({ games, onAddGame, onDeleteGame }) {
                     />
                 ))}
             </section>
+
+            {deletedGames.length > 0 && (
+                <section>
+                    <h2>Deleted games</h2>
+                    {deletedGames.map((game) => (
+                        <p key={game.id}>
+                            {game.title}{" "}
+                            <button onClick={() => onRestoreGame(game.id)}>Restore</button>
+                        </p>
+                    ))}
+                </section>
+            )}
         </>
     );
 }

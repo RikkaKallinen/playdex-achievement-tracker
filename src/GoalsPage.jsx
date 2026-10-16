@@ -6,7 +6,7 @@ function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpda
         <>
             <section>
                 <h2>Add a goal</h2>
-                <AddGoalForm games={games} onAddGoal={onAddGoal} />
+                <AddGoalForm games={games.filter((game) => !game.deleted)} onAddGoal={onAddGoal} />
             </section>
 
             <section>

@@ -14,6 +14,8 @@ function App() {
         return savedGames ? JSON.parse(savedGames) : starterGames;
     });
 
+    const activeGames = games.filter((game) => !game.deleted);
+
     useEffect(() => {
         localStorage.setItem("playdex-games", JSON.stringify(games));
     }, [games]);
@@ -97,11 +99,27 @@ function App() {
     }
 
     function deleteGame(gameToDelete) {
-        if (!confirm("Delete " + gameToDelete.title + " and all its achievements?")) {
+        if (!confirm("Delete " + gameToDelete.title + "? You can restore it from Deleted games on the Games page.")) {
             return;
         }
 
-        setGames(games.filter((game) => game.id !== gameToDelete.id));
+        setGames(games.map((game) => {
+            if (game.id !== gameToDelete.id) {
+                return game;
+            }
+
+            return { ...game, deleted: true };
+        }));
+    }
+
+    function restoreGame(gameId) {
+        setGames(games.map((game) => {
+            if (game.id !== gameId) {
+                return game;
+            }
+
+            return { ...game, deleted: false };
+        }));
     }
 
     function deleteAchievement(gameId, achievementName) {
@@ -232,6 +250,7 @@ function App() {
                                 games={games}
                                 onAddGame={addGame}
                                 onDeleteGame={deleteGame}
+                                onRestoreGame={restoreGame}
                             />
                         }
                     />
@@ -282,13 +301,13 @@ function App() {
                     />
                     <Route
                         path="/summary"
-                        element={<SummaryPage games={games} hiddenPlatforms={hiddenPlatforms} />}
+                        element={<SummaryPage games={activeGames} hiddenPlatforms={hiddenPlatforms} />}
                     />
                     <Route
                         path="/settings"
                         element={
                             <SettingsPage
-                                games={games}
+                                games={activeGames}
                                 hiddenPlatforms={hiddenPlatforms}
                                 onTogglePlatform={togglePlatform}
                             />
