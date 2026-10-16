@@ -6,6 +6,7 @@ import GamesPage from "./GamesPage";
 import GamePage from "./GamePage";
 import SessionPage from "./SessionPage";
 import SummaryPage from "./SummaryPage";
+import SettingsPage from "./SettingsPage";
 
 function App() {
     const [games, setGames] = useState(() => {
@@ -46,6 +47,15 @@ function App() {
     useEffect(() => {
         localStorage.setItem("playdex-journal", JSON.stringify(journalEntries));
     }, [journalEntries]);
+
+    const [hiddenPlatforms, setHiddenPlatforms] = useState(() => {
+        const savedHiddenPlatforms = localStorage.getItem("playdex-hidden-platforms");
+        return savedHiddenPlatforms ? JSON.parse(savedHiddenPlatforms) : [];
+    });
+
+    useEffect(() => {
+        localStorage.setItem("playdex-hidden-platforms", JSON.stringify(hiddenPlatforms));
+    }, [hiddenPlatforms]);
 
     function toggleAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
@@ -188,6 +198,14 @@ function App() {
         setJournalEntries(journalEntries.filter((entry) => entry.id !== entryId));
     }
 
+    function togglePlatform(platform) {
+        if (hiddenPlatforms.includes(platform)) {
+            setHiddenPlatforms(hiddenPlatforms.filter((hiddenPlatform) => hiddenPlatform !== platform));
+        } else {
+            setHiddenPlatforms([...hiddenPlatforms, platform]);
+        }
+    }
+
     return (
         <>
             <header>
@@ -201,6 +219,8 @@ function App() {
                     <Link to="/session">Session</Link>
                     {" "}
                     <Link to="/summary">Summary</Link>
+                    {" "}
+                    <Link to="/settings">Settings</Link>
                 </nav>
             </header>
             <main>
@@ -262,7 +282,17 @@ function App() {
                     />
                     <Route
                         path="/summary"
-                        element={<SummaryPage games={games} />}
+                        element={<SummaryPage games={games} hiddenPlatforms={hiddenPlatforms} />}
+                    />
+                    <Route
+                        path="/settings"
+                        element={
+                            <SettingsPage
+                                games={games}
+                                hiddenPlatforms={hiddenPlatforms}
+                                onTogglePlatform={togglePlatform}
+                            />
+                        }
                     />
                 </Routes>
             </main>

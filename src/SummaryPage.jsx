@@ -31,7 +31,7 @@ function countTrophies(games) {
     }));
 }
 
-function SummaryPage({ games }) {
+function SummaryPage({ games, hiddenPlatforms }) {
     const overall = countAchievements(games);
 
     const platformSections = Object.keys(platformNames)
@@ -40,7 +40,7 @@ function SummaryPage({ games }) {
             name: platformNames[platform],
             games: games.filter((game) => game.platform === platform)
         }))
-        .filter((section) => section.games.length > 0);
+        .filter((section) => section.games.length > 0 && !hiddenPlatforms.includes(section.platform));
 
     return (
         <>
