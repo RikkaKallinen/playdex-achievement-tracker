@@ -11,6 +11,14 @@ export const trophyTiers = {
     bronze: "Bronze"
 };
 
+export const accentColors = {
+    purple: "Purple",
+    teal: "Teal",
+    green: "Green",
+    orange: "Orange",
+    pink: "Pink"
+};
+
 export const starterGames = [
     {
         id: "peak",

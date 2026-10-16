@@ -1,21 +1,99 @@
+:root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface-raised: #252a37;
+    --border: #2f3546;
+    --text: #e8e9ee;
+    --text-muted: #9aa0b2;
+    --accent: #a78bfa;
+    --accent-text: #0f1117;
+    --radius: 10px;
+    color-scheme: dark;
+}
+
+[data-accent="purple"] { --accent: #a78bfa; }
+[data-accent="teal"] { --accent: #2dd4bf; }
+[data-accent="green"] { --accent: #4ade80; }
+[data-accent="orange"] { --accent: #fb923c; }
+[data-accent="pink"] { --accent: #f472b6; }
+
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     line-height: 1.5;
-    max-width: 800px;
+    max-width: 960px;
     margin: 0 auto;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: 0 16px 48px;
+    background: var(--bg);
+    color: var(--text);
+    accent-color: var(--accent);
 }
 
+a {
+    color: var(--accent);
+}
+
+h1,
+h2,
+h3 {
+    line-height: 1.2;
+}
+
+/* Cards */
 .game-card,
 .achievement-card,
 .goal-card,
 .timeline-item {
-    /* Shared rules */
-    border: 1px solid black;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
     padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+.achievement-card.unlocked,
+.goal-card.completed {
+    border-color: var(--accent);
+}
+
+/* Buttons */
+button {
+    font: inherit;
+    font-weight: 600;
+    padding: 6px 14px;
+    color: var(--accent-text);
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    filter: brightness(1.1);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: none;
+}
+
+/* Form fields */
+input,
+select,
+textarea {
+    font: inherit;
+    color: var(--text);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
 }
 
 form label,
@@ -26,20 +104,19 @@ form button {
     margin-bottom: 8px;
 }
 
-.achievement-card.unlocked {
-    border-color: green;
-}
-
-.goal-card.completed {
-    border-color: green;
-}
-
 textarea {
     display: block;
     width: 100%;
+    box-sizing: border-box;
     margin-top: 4px;
 }
 
+details summary {
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+/* Timeline filter dropdown */
 .filter-dropdown {
     position: relative;
     display: inline-block;
@@ -47,10 +124,11 @@ textarea {
 }
 
 .filter-dropdown summary {
-    cursor: pointer;
     list-style: none;
-    border: 1px solid black;
-    border-radius: 8px;
+    color: var(--text);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 6px;
     padding: 4px 12px;
 }
 
@@ -65,9 +143,9 @@ textarea {
     margin: 4px 0 0;
     padding: 4px 0;
     list-style: none;
-    background: white;
-    border: 1px solid black;
-    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
 }
 
 .filter-dropdown li button {
@@ -75,17 +153,41 @@ textarea {
     width: 100%;
     padding: 4px 12px;
     text-align: left;
-    font: inherit;
+    font-weight: normal;
+    color: var(--text);
     background: none;
-    border: none;
-    cursor: pointer;
+    border-radius: 0;
 }
 
 .filter-dropdown li button:hover {
-    background: #eee;
+    background: var(--surface-raised);
+    filter: none;
 }
 
 .check {
     display: inline-block;
     width: 1.5em;
+}
+
+/* Accent color picker */
+.swatch-button {
+    font-weight: normal;
+    color: var(--text);
+    background: var(--surface-raised);
+    border: 2px solid transparent;
+    margin: 0 8px 8px 0;
+}
+
+.swatch-button.selected {
+    border-color: var(--text);
+}
+
+.swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    vertical-align: -2px;
+    border-radius: 50%;
+    background: var(--accent);
 }

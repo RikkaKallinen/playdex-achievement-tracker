@@ -59,6 +59,15 @@ function App() {
         localStorage.setItem("playdex-hidden-platforms", JSON.stringify(hiddenPlatforms));
     }, [hiddenPlatforms]);
 
+    const [accentColor, setAccentColor] = useState(() => {
+        return localStorage.getItem("playdex-accent") || "purple";
+    });
+
+    useEffect(() => {
+        localStorage.setItem("playdex-accent", accentColor);
+        document.documentElement.dataset.accent = accentColor;
+    }, [accentColor]);
+
     function toggleAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
             if (game.id !== gameId) {
@@ -330,6 +339,8 @@ function App() {
                                 games={activeGames}
                                 hiddenPlatforms={hiddenPlatforms}
                                 onTogglePlatform={togglePlatform}
+                                accentColor={accentColor}
+                                onChangeAccent={setAccentColor}
                             />
                         }
                     />
