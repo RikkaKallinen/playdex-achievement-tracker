@@ -1,6 +1,6 @@
-import { platformNames, accentColors } from "./data";
+import { platformNames, accentColors, fontOptions } from "./data";
 
-function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent }) {
+function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent, fontChoice, onChangeFont }) {
     return (
         <section>
             <h2>Settings</h2>
@@ -15,6 +15,20 @@ function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, o
                     >
                         <span className="swatch" data-accent={color} />
                         {accentColors[color]}
+                    </button>
+                ))}
+            </p>
+            <h3>Font</h3>
+            <p>
+                {Object.keys(fontOptions).map((font) => (
+                    <button
+                        key={font}
+                        type="button"
+                        data-font={font}
+                        className={font === fontChoice ? "swatch-button font-preview selected" : "swatch-button font-preview"}
+                        onClick={() => onChangeFont(font)}
+                    >
+                        {fontOptions[font]}
                     </button>
                 ))}
             </p>

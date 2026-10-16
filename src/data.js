@@ -19,6 +19,11 @@ export const accentColors = {
     pink: "Pink"
 };
 
+export const fontOptions = {
+    default: "Default",
+    dyslexic: "OpenDyslexic"
+};
+
 export const starterGames = [
     {
         id: "peak",

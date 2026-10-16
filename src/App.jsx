@@ -68,6 +68,15 @@ function App() {
         document.documentElement.dataset.accent = accentColor;
     }, [accentColor]);
 
+    const [fontChoice, setFontChoice] = useState(() => {
+        return localStorage.getItem("playdex-font") || "default";
+    });
+
+    useEffect(() => {
+        localStorage.setItem("playdex-font", fontChoice);
+        document.documentElement.dataset.font = fontChoice;
+    }, [fontChoice]);
+
     function toggleAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
             if (game.id !== gameId) {
@@ -341,6 +350,8 @@ function App() {
                                 onTogglePlatform={togglePlatform}
                                 accentColor={accentColor}
                                 onChangeAccent={setAccentColor}
+                                fontChoice={fontChoice}
+                                onChangeFont={setFontChoice}
                             />
                         }
                     />
