@@ -1,6 +1,6 @@
 import { trophyTiers } from "./data";
 
-function AchievementCard({ achievement, onToggle, onDelete }) {
+function AchievementCard({ achievement, onToggle, onDelete, onNotesChange }) {
     const cardClass = achievement.earned
         ? "achievement-card unlocked"
         : "achievement-card";
@@ -29,6 +29,15 @@ function AchievementCard({ achievement, onToggle, onDelete }) {
                     Unlocked on <time dateTime={achievement.earnedDate}>{formattedDate}</time>
                 </p>
             )}
+            {achievement.notes && <p><em>Note:</em> {achievement.notes}</p>}
+            <details>
+                <summary>{achievement.notes ? "Edit note" : "Add a note"}</summary>
+                <textarea
+                    rows="3"
+                    value={achievement.notes || ""}
+                    onChange={(event) => onNotesChange(event.target.value)}
+                />
+            </details>
         </article>
     );
 }

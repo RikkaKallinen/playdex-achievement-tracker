@@ -17,6 +17,7 @@ function TimelineItem({ item, onDelete }) {
             </p>
             {item.title && <h3>{item.title}</h3>}
             {item.text && <p>{item.text}</p>}
+            {item.note && <p><em>Note:</em> {item.note}</p>}
             {onDelete && <button onClick={onDelete}>Delete</button>}
         </article>
     );

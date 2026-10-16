@@ -135,6 +135,25 @@ function App() {
         }));
     }
 
+    function updateAchievementNotes(gameId, achievementName, notes) {
+        setGames(games.map((game) => {
+            if (game.id !== gameId) {
+                return game;
+            }
+
+            return {
+                ...game,
+                achievements: game.achievements.map((achievement) => {
+                    if (achievement.name !== achievementName) {
+                        return achievement;
+                    }
+
+                    return { ...achievement, notes: notes };
+                })
+            };
+        }));
+    }
+
     function addGoal(newGoal) {
         setGoals([...goals, newGoal]);
     }
@@ -262,6 +281,7 @@ function App() {
                                 onAddAchievement={addAchievement}
                                 onToggleAchievement={toggleAchievement}
                                 onDeleteAchievement={deleteAchievement}
+                                onUpdateAchievementNotes={updateAchievementNotes}
                                 goals={goals}
                                 sessions={sessions}
                                 journalEntries={journalEntries}
