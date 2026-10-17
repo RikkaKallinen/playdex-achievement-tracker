@@ -4,6 +4,7 @@ function AddGameForm({ onAddGame }) {
     const [title, setTitle] = useState("");
     const [platform, setPlatform] = useState("steam");
     const [otherPlatform, setOtherPlatform] = useState("");
+    const [coverUrl, setCoverUrl] = useState("");
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -13,12 +14,14 @@ function AddGameForm({ onAddGame }) {
             title: title,
             platform: platform,
             otherPlatform: platform === "other" ? otherPlatform : "",
+            coverUrl: coverUrl,
             achievements: []
         });
 
         setTitle("");
         setPlatform("steam");
         setOtherPlatform("");
+        setCoverUrl("");
     }
 
     return (
@@ -56,6 +59,16 @@ function AddGameForm({ onAddGame }) {
                     />
                 </>
             )}
+
+            <label htmlFor="game-cover">Cover image link (optional)</label>
+            <input
+                type="url"
+                id="game-cover"
+                placeholder="https://..."
+                value={coverUrl}
+                onChange={(event) => setCoverUrl(event.target.value)}
+            />
+
             <button type="submit">Add Game</button>
         </form>
     );

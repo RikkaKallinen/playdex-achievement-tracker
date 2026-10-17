@@ -14,7 +14,7 @@ const filterOptions = [
     { type: "summary", label: "Session summaries" }
 ];
 
-function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievementNotes, onAddJournalEntry, onDeleteJournalEntry }) {
+function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievementNotes, onUpdateGameCover, onAddJournalEntry, onDeleteJournalEntry }) {
     const { gameId } = useParams();
     const game = games.find((game) => game.id === gameId);
     const [shownTypes, setShownTypes] = useState(filterOptions.map((option) => option.type));
@@ -97,6 +97,18 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
             <section>
                 <Link to="/">Back to games</Link>
                 <h2>{game.title}</h2>
+                <details>
+                    <summary>{game.coverUrl ? "Change cover" : "Add a cover"}</summary>
+                    <label htmlFor="cover-url">Cover image link</label>
+                    <input
+                        type="url"
+                        id="cover-url"
+                        placeholder="https://..."
+                        value={game.coverUrl || ""}
+                        onChange={(event) => onUpdateGameCover(game.id, event.target.value)}
+                    />
+                </details>
+
                 <AddAchievementForm
                     platform={game.platform}
                     onAddAchievement={(newAchievement) => onAddAchievement(game.id, newAchievement)}

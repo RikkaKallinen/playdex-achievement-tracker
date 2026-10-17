@@ -141,6 +141,16 @@ function App() {
         }));
     }
 
+    function updateGameCover(gameId, coverUrl) {
+        setGames(games.map((game) => {
+            if (game.id !== gameId) {
+                return game;
+            }
+
+            return { ...game, coverUrl: coverUrl };
+        }));
+    }
+
     function deleteAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
             if (game.id !== gameId) {
@@ -288,6 +298,7 @@ function App() {
                                 onToggleAchievement={toggleAchievement}
                                 onDeleteAchievement={deleteAchievement}
                                 onUpdateAchievementNotes={updateAchievementNotes}
+                                onUpdateGameCover={updateGameCover}
                                 goals={goals}
                                 sessions={sessions}
                                 journalEntries={journalEntries}

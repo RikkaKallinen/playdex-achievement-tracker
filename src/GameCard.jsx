@@ -13,7 +13,7 @@ function GameCard({ game, onSelect, onDelete }) {
     return (
         <article className="game-card" onClick={onSelect}>
             <div className="game-cover" aria-hidden="true">
-                {game.title.charAt(0)}
+                {game.coverUrl ? <img src={game.coverUrl} alt="" /> : game.title.charAt(0)}
             </div>
             <div className="game-info">
                 <h3>{game.title}</h3>
