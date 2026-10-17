@@ -33,9 +33,7 @@ body {
     font-family: var(--font-body);
     font-variant-numeric: tabular-nums;
     line-height: 1.5;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 16px 48px;
+    margin: 0;
     background:
         radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 15%, transparent), transparent 45%),
         var(--bg);
@@ -66,6 +64,168 @@ h1 {
 h2 {
     text-transform: uppercase;
     letter-spacing: 0.06em;
+}
+
+/* Layout */
+.app-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+}
+
+main {
+    width: 100%;
+    max-width: 960px;
+    padding: 24px 32px 48px;
+    box-sizing: border-box;
+}
+
+.label {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.unit {
+    font-size: 0.5em;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* Sidebar */
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px 16px;
+    box-sizing: border-box;
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    border-right: 2px solid var(--border);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 50%, black));
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.brand h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.brand p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.stat-card {
+    padding: 16px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.stat-number {
+    margin: 4px 0 10px;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent);
+}
+
+.stat-bar {
+    height: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--surface-raised);
+}
+
+.stat-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 40%, white));
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-left: 3px solid transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text-muted);
+}
+
+.sidebar nav a:hover {
+    color: var(--text);
+    background: var(--surface-raised);
+}
+
+.sidebar nav a.active {
+    color: var(--text);
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    border-left-color: var(--accent);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    font-size: 0.65rem;
+}
+
+/* Phones */
+@media (max-width: 768px) {
+    .app-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .sidebar nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    main {
+        padding: 16px;
+    }
 }
 
 /* Cards */

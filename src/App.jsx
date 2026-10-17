@@ -1,12 +1,13 @@
 import { starterGames } from "./data";
 import { useState, useEffect } from "react";
-import { Routes, Route, Link } from "react-router";
+import { Routes, Route } from "react-router";
 import GoalsPage from "./GoalsPage";
 import GamesPage from "./GamesPage";
 import GamePage from "./GamePage";
 import SessionPage from "./SessionPage";
 import SummaryPage from "./SummaryPage";
 import SettingsPage from "./SettingsPage";
+import Sidebar from "./Sidebar";
 
 function App() {
     const [games, setGames] = useState(() => {
@@ -262,22 +263,9 @@ function App() {
     }
 
     return (
-        <>
-            <header>
-                <h1>Playdex</h1>
-                <p>Track it. Log it. Beat it.</p>
-                <nav>
-                    <Link to="/">Games</Link>
-                    {" "}
-                    <Link to="/goals">Goals</Link>
-                    {" "}
-                    <Link to="/session">Session</Link>
-                    {" "}
-                    <Link to="/summary">Summary</Link>
-                    {" "}
-                    <Link to="/settings">Settings</Link>
-                </nav>
-            </header>
+        <div className="app-layout">
+            <Sidebar games={activeGames} />
+
             <main>
                 <Routes>
                     <Route
@@ -357,7 +345,7 @@ function App() {
                     />
                 </Routes>
             </main>
-        </>
+        </div>
     );
 }
 
