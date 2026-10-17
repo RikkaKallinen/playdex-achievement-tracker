@@ -229,7 +229,6 @@ main {
 }
 
 /* Cards */
-.game-card,
 .achievement-card,
 .goal-card,
 .timeline-item {
@@ -244,6 +243,109 @@ main {
 .goal-card.completed {
     border-color: var(--accent);
     box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* Game Tiles */
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.game-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.game-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.game-cover {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--text) 85%, transparent);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 60%, black), var(--surface-raised));
+}
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px 14px;
+}
+
+.game-info h3 {
+    margin: 0;
+}
+
+.game-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Badges */
+.badge {
+    width: fit-content;
+    margin: 0;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+    border-radius: 999px;
+}
+
+/* Progress ring */
+.progress-ring {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: conic-gradient(var(--accent) calc(var(--percent) * 1%), var(--surface-raised) 0);
+}
+
+.progress-ring span {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--surface);
+}
+
+/* Quiet buttons */
+.button-quiet {
+    width: fit-content;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--border);
+}
+
+.button-quiet:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+    filter: none;
 }
 
 /* Buttons */

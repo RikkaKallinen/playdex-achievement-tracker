@@ -18,14 +18,16 @@ function GamesPage({ games, onAddGame, onDeleteGame, onRestoreGame }) {
             <section>
                 <h2>See their games</h2>
                 {activeGames.length === 0 && <p>No games yet</p>}
-                {activeGames.map((game) => (
-                    <GameCard
-                        key={game.id}
-                        game={game}
-                        onSelect={() => navigate("/games/" + game.id)}
-                        onDelete={() => onDeleteGame(game)}
-                    />
-                ))}
+                <div className="game-grid">
+                    {activeGames.map((game) => (
+                        <GameCard
+                            key={game.id}
+                            game={game}
+                            onSelect={() => navigate("/games/" + game.id)}
+                            onDelete={() => onDeleteGame(game)}
+                        />
+                    ))}
+                </div>
             </section>
 
             {deletedGames.length > 0 && (
