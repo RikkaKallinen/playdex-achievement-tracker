@@ -6,6 +6,7 @@ function AddAchievementForm({ platform, onAddAchievement }) {
     const [description, setDescription] = useState("");
     const [gamerscore, setGamerscore] = useState("");
     const [trophyTier, setTrophyTier] = useState("bronze");
+    const [iconUrl, setIconUrl] = useState("");
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -16,6 +17,7 @@ function AddAchievementForm({ platform, onAddAchievement }) {
             source: "manual",
             gamerscore: platform === "xbox" ? Number(gamerscore) : null,
             trophyTier: platform === "playstation" ? trophyTier : null,
+            iconUrl: iconUrl,
             earned: false,
             earnedDate: null
         });
@@ -24,6 +26,7 @@ function AddAchievementForm({ platform, onAddAchievement }) {
         setDescription("");
         setGamerscore("");
         setTrophyTier("bronze");
+        setIconUrl("");
     }
 
     return (
@@ -73,6 +76,15 @@ function AddAchievementForm({ platform, onAddAchievement }) {
                     </select>
                 </>
             )}
+
+            <label htmlFor="achievement-icon">Icon image link (optional)</label>
+            <input
+                type="url"
+                id="achievement-icon"
+                placeholder="https://..."
+                value={iconUrl}
+                onChange={(event) => setIconUrl(event.target.value)}
+            />
 
             <button type="submit">Add achievement</button>
         </form>

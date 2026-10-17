@@ -14,7 +14,7 @@ const filterOptions = [
     { type: "summary", label: "Session summaries" }
 ];
 
-function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievementNotes, onUpdateGameCover, onAddJournalEntry, onDeleteJournalEntry }) {
+function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievement, onUpdateGameCover, onAddJournalEntry, onDeleteJournalEntry }) {
     const { gameId } = useParams();
     const game = games.find((game) => game.id === gameId);
     const [shownTypes, setShownTypes] = useState(filterOptions.map((option) => option.type));
@@ -119,7 +119,7 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                         achievement={achievement}
                         onToggle={() => onToggleAchievement(game.id, achievement.name)}
                         onDelete={() => onDeleteAchievement(game.id, achievement.name)}
-                        onNotesChange={(notes) => onUpdateAchievementNotes(game.id, achievement.name, notes)}
+                        onUpdate={(changes) => onUpdateAchievement(game.id, achievement.name, changes)}
                     />
                 ))}
             </section>

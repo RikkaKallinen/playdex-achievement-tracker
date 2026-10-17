@@ -288,10 +288,15 @@ main {
 }
 
 .game-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding: 12px 14px 14px;
+}
+
+.game-info .button-quiet {
+    margin-top: auto;
 }
 
 .game-info h3 {
@@ -355,6 +360,114 @@ main {
     color: var(--text);
     border-color: var(--text-muted);
     filter: none;
+}
+
+/* Achievement cards */
+.achievement-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.achievement-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    background: var(--surface-raised);
+    border: 2px solid var(--border);
+    overflow: hidden;
+}
+
+.achievement-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.achievement-card.unlocked .achievement-icon {
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    border-color: var(--accent);
+}
+
+.achievement-card:not(.unlocked) .achievement-icon {
+    filter: grayscale(1);
+    opacity: 0.6;
+}
+
+.achievement-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.achievement-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.achievement-header h3 {
+    margin: 0;
+}
+
+.gamerscore {
+    margin-left: auto;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.achievement-description {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+}
+
+.achievement-date {
+    margin: 6px 0 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.achievement-card:not(.unlocked) .achievement-date {
+    font-weight: normal;
+    color: var(--text-muted);
+}
+
+.achievement-note {
+    margin: 8px 0 0;
+    font-size: 0.9rem;
+}
+
+.achievement-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.achievement-card details {
+    margin-top: 8px;
+}
+
+/* Trophy Tiers */
+.tier-platinum { --tier: #7dd3fc; }
+.tier-gold { --tier: #f5b544; }
+.tier-silver { --tier: #b8c0cc; }
+.tier-bronze { --tier: #cd7f32; }
+
+.trophy-badge {
+    color: var(--tier);
+    border-color: color-mix(in srgb, var(--tier) 50%, transparent);
+}
+
+.achievement-card .achievement-icon[class*="tier-"] {
+    border-color: var(--tier);
 }
 
 /* Buttons */
@@ -496,4 +609,40 @@ details summary {
 
 .font-preview {
     font-family: var(--font-body);
+}
+
+/* Tile Stats */
+.tile-gamerscore {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.trophy-counts {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.trophy-count {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--tier);
+    border: 1px solid color-mix(in srgb, var(--tier) 50%, transparent);
+    border-radius: 999px;
+}
+
+.trophy-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--tier);
 }

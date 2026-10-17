@@ -164,7 +164,7 @@ function App() {
         }));
     }
 
-    function updateAchievementNotes(gameId, achievementName, notes) {
+    function updateAchievement(gameId, achievementName, changes) {
         setGames(games.map((game) => {
             if (game.id !== gameId) {
                 return game;
@@ -177,7 +177,7 @@ function App() {
                         return achievement;
                     }
 
-                    return { ...achievement, notes: notes };
+                    return { ...achievement, ...changes };
                 })
             };
         }));
@@ -297,7 +297,7 @@ function App() {
                                 onAddAchievement={addAchievement}
                                 onToggleAchievement={toggleAchievement}
                                 onDeleteAchievement={deleteAchievement}
-                                onUpdateAchievementNotes={updateAchievementNotes}
+                                onUpdateAchievement={updateAchievement}
                                 onUpdateGameCover={updateGameCover}
                                 goals={goals}
                                 sessions={sessions}
