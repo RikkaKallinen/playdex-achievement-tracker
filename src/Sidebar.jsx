@@ -1,5 +1,6 @@
 import { NavLink } from "react-router";
 import { ChartColumn, Gamepad2, Settings, Target, Zap } from "lucide-react";
+import { getPlatformText } from "./data";
 import { countAchievements } from "./stats";
 
 const navLinks = [
@@ -10,7 +11,8 @@ const navLinks = [
     { to: "/settings", label: "Settings", Icon: Settings }
 ];
 
-function Sidebar({ games }) {
+function Sidebar({ games, profile }) {
+    const shownGamertags = profile.gamertags.filter((gamertag) => gamertag.shown && gamertag.tag);
     const counts = countAchievements(games);
     const percent = counts.total > 0 ? Math.round((counts.unlocked / counts.total) * 100) : 0;
 
@@ -23,6 +25,22 @@ function Sidebar({ games }) {
                 <div>
                     <h1>Playdex</h1>
                     <p>Track it. Log it. Beat it.</p>
+                </div>
+            </div>
+
+            <div className="sidebar-profile">
+                <span className="avatar" aria-hidden="true">
+                    {profile.avatarUrl
+                        ? <img src={profile.avatarUrl} alt="" />
+                        : (profile.name || "Player").charAt(0).toUpperCase()}
+                </span>
+                <div className="profile-text">
+                    <p className="profile-name">{profile.name || "Player"}</p>
+                    {shownGamertags.map((gamertag) => (
+                        <p key={gamertag.id} className="profile-tag">
+                            <span className="profile-platform">{getPlatformText(gamertag)}</span> {gamertag.tag}
+                        </p>
+                    ))}
                 </div>
             </div>
 

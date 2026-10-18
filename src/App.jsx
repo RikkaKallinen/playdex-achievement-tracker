@@ -78,6 +78,19 @@ function App() {
         document.documentElement.dataset.font = fontChoice;
     }, [fontChoice]);
 
+    const [profile, setProfile] = useState(() => {
+        const savedProfile = localStorage.getItem("playdex-profile");
+        return savedProfile ? JSON.parse(savedProfile) : { name: "", avatarUrl: "", gamertags: [] };
+    });
+
+    useEffect(() => {
+        localStorage.setItem("playdex-profile", JSON.stringify(profile));
+    }, [profile]);
+
+    function updateProfile(changes) {
+        setProfile((current) => ({ ...current, ...changes }));
+    }
+
     function toggleAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
             if (game.id !== gameId) {
@@ -274,7 +287,7 @@ function App() {
 
     return (
         <div className="app-layout">
-            <Sidebar games={activeGames} />
+            <Sidebar games={activeGames} profile={profile} />
 
             <main>
                 <Routes>
@@ -351,6 +364,8 @@ function App() {
                                 onChangeAccent={setAccentColor}
                                 fontChoice={fontChoice}
                                 onChangeFont={setFontChoice}
+                                profile={profile}
+                                onUpdateProfile={updateProfile}
                             />
                         }
                     />
