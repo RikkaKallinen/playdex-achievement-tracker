@@ -1,4 +1,5 @@
 import { starterGames } from "./data";
+import { mergeSteamGames } from "./steamSync";
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router";
 import GoalsPage from "./GoalsPage";
@@ -80,7 +81,7 @@ function App() {
 
     const [profile, setProfile] = useState(() => {
         const savedProfile = localStorage.getItem("playdex-profile");
-        return savedProfile ? JSON.parse(savedProfile) : { name: "", avatarUrl: "", gamertags: [] };
+        return savedProfile ? JSON.parse(savedProfile) : { name: "", avatarUrl: "", gamertags: [], steamId: "" };
     });
 
     useEffect(() => {
@@ -89,6 +90,38 @@ function App() {
 
     function updateProfile(changes) {
         setProfile((current) => ({ ...current, ...changes }));
+    }
+
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [syncStatus, setSyncStatus] = useState("");
+
+    async function syncSteam() {
+        setIsSyncing(true);
+        setSyncStatus("Getting your Steam games...");
+
+        const gamesResponse = await fetch("/api/steam/games?steamId=" + profile.steamId);
+        if (!gamesResponse.ok) {
+            setSyncStatus("Couldn't reach Steam. Check your Steam ID and that the server is running.");
+            setIsSyncing(false);
+            return;
+        }
+
+        const steamGames = await gamesResponse.json();
+        const playedGames = steamGames.filter((steamGame) => steamGame.playtimeMinutes > 0);
+
+        for (let index = 0; index < playedGames.length; index++) {
+            const steamGame = playedGames[index];
+            setSyncStatus("Getting achievements " + (index + 1) + " of " + playedGames.length + ": " + steamGame.title);
+
+            const achievementsResponse = await fetch("/api/steam/achievements?steamId=" + profile.steamId + "&appId=" + steamGame.steamAppId);
+            if (achievementsResponse.ok) {
+                steamGame.achievements = await achievementsResponse.json();
+            }
+        }
+
+        setGames((currentGames) => mergeSteamGames(currentGames, steamGames));
+        setSyncStatus("Synced " + steamGames.length + " games from Steam.");
+        setIsSyncing(false);
     }
 
     function toggleAchievement(gameId, achievementName) {
@@ -366,6 +399,9 @@ function App() {
                                 onChangeFont={setFontChoice}
                                 profile={profile}
                                 onUpdateProfile={updateProfile}
+                                onSyncSteam={syncSteam}
+                                isSyncing={isSyncing}
+                                syncStatus={syncStatus}
                             />
                         }
                     />

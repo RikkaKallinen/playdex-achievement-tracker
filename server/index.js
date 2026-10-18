@@ -3,6 +3,22 @@ import express from "express";
 const app = express();
 const port = 3001;
 
+async function findCoverUrl(appId) {
+    const simpleUrl = "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/header.jpg";
+    const simpleResponse = await fetch(simpleUrl, { method: "HEAD" });
+    if (simpleResponse.ok) {
+        return simpleUrl;
+    }
+
+    const storeResponse = await fetch("https://store.steampowered.com/api/appdetails?filters=basic&appids=" + appId);
+    if (!storeResponse.ok) {
+        return "";
+    }
+
+    const storeData = await storeResponse.json();
+    return storeData?.[appId]?.data?.header_image || "";
+}
+
 app.get("/api/steam/games", async (request, response) => {
     const params = new URLSearchParams({
         key: process.env.STEAM_API_KEY,
@@ -18,7 +34,19 @@ app.get("/api/steam/games", async (request, response) => {
     }
 
     const data = await steamResponse.json();
-    response.json(data.response.games || []);
+    const steamGames = data.response.games || [];
+
+    const games = await Promise.all(steamGames.map(async (steamGame) => ({
+        steamAppId: steamGame.appid,
+        title: steamGame.name,
+        playtimeMinutes: steamGame.playtime_forever,
+        lastPlayed: steamGame.rtime_last_played > 0
+            ? new Date(steamGame.rtime_last_played * 1000).toLocaleDateString("en-CA")
+            : null,
+        coverUrl: await findCoverUrl(steamGame.appid)
+    })));
+
+    response.json(games);
 });
 
 app.get("/api/steam/achievements", async (request, response) => {

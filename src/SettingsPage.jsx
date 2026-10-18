@@ -3,7 +3,7 @@ import { platformNames, accentColors, fontOptions } from "./data";
 import { cropImage } from "./resizeImage";
 import AvatarCropper from "./AvatarCropper";
 
-function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent, fontChoice, onChangeFont, profile, onUpdateProfile }) {
+function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent, fontChoice, onChangeFont, profile, onUpdateProfile, onSyncSteam, isSyncing, syncStatus }) {
     const [draft, setDraft] = useState(profile);
     const [cropSource, setCropSource] = useState(null);
 
@@ -164,6 +164,25 @@ function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, o
             <p>
                 <button type="button" className="button-quiet" onClick={addGamertag}>+ Add gamertag</button>
             </p>
+
+            <h3>Steam</h3>
+            <div className="settings-fields">
+                <label htmlFor="steam-id">Steam ID</label>
+                <input
+                    type="text"
+                    id="steam-id"
+                    inputMode="numeric"
+                    placeholder="7656119..."
+                    value={draft.steamId || ""}
+                    onChange={(event) => updateDraft({ steamId: event.target.value.trim() })}
+                />
+            </div>
+            <div className="button-row">
+                <button type="button" onClick={onSyncSteam} disabled={!profile.steamId || hasChanges || isSyncing}>
+                    Sync with Steam
+                </button>
+                {syncStatus && <span>{syncStatus}</span>}
+            </div>
 
             <div className="button-row save-bar">
                 <button type="button" onClick={() => onUpdateProfile(draft)} disabled={!hasChanges}>
