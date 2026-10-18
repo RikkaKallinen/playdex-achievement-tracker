@@ -4,6 +4,12 @@ export const platformNames = {
     playstation: "PlayStation"
 };
 
+export function getPlatformText(game) {
+    return game.platform === "other"
+    ? "Other - " + game.otherPlatform
+    : platformNames[game.platform];
+}
+
 export const trophyTiers = {
     platinum: "Platinum",
     gold: "Gold",

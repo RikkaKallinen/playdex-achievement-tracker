@@ -1,6 +1,8 @@
-function ProgressRing({ percent }) {
+function ProgressRing({ percent, size }) {
+    const ringClass = size === "large" ? "progress-ring large" : "progress-ring";
+
     return (
-        <div className="progress-ring" style={{ "--percent": percent }}>
+        <div className={ringClass} style={{ "--percent": percent }}>
             <span>{percent}%</span>
         </div>
     );

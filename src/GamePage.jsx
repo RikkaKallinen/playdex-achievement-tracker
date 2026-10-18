@@ -6,6 +6,11 @@ import AddJournalEntryForm from "./AddJournalEntryForm";
 import TimelineItem from "./TimelineItem";
 import FilterDropdown from "./FilterDropdown";
 import { getGoalStatus } from "./goalStatus";
+import { getPlatformText } from "./data";
+import GameCover from "./GameCover";
+import PlatformStat from "./PlatformStat";
+import ProgressRing from "./ProgressRing";
+import { countAchievements } from "./stats";
 
 const filterOptions = [
     { type: "entry", label: "Journal entries" },
@@ -92,27 +97,50 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
 
     const shownItems = timelineItems.filter((item) => shownTypes.includes(item.type));
 
+    const counts = countAchievements([game]);
+    const percent = counts.total > 0 ? Math.round((counts.unlocked / counts.total) * 100) : 0;
+
     return (
         <>
             <section>
-                <Link to="/">Back to games</Link>
-                <h2>{game.title}</h2>
-                <details>
-                    <summary>{game.coverUrl ? "Change cover" : "Add a cover"}</summary>
-                    <label htmlFor="cover-url">Cover image link</label>
-                    <input
-                        type="url"
-                        id="cover-url"
-                        placeholder="https://..."
-                        value={game.coverUrl || ""}
-                        onChange={(event) => onUpdateGameCover(game.id, event.target.value)}
-                    />
-                </details>
+                <Link to="/" className="back-link">← Back to games</Link>
 
-                <AddAchievementForm
-                    platform={game.platform}
-                    onAddAchievement={(newAchievement) => onAddAchievement(game.id, newAchievement)}
-                />
+                <div className="game-header">
+                    <GameCover game={game} className="game-cover game-header-cover" />
+                    <div className="game-header-info">
+                        <h2>{game.title}</h2>
+                        <p className="badge">{getPlatformText(game)}</p>
+                        <p className="game-header-stats">
+                            {counts.unlocked} / {counts.total} achievements · {percent}% complete
+                        </p>
+                        <PlatformStat game={game} />
+                    </div>
+                    <ProgressRing percent={percent} size="large" />
+                </div>
+
+                <div className="game-header-actions">
+                    <details className="add-panel">
+                        <summary>+ Add achievement</summary>
+                        <AddAchievementForm
+                            platform={game.platform}
+                            onAddAchievement={(newAchievement) => onAddAchievement(game.id, newAchievement)}
+                        />
+                    </details>
+                    <details>
+                        <summary>{game.coverUrl ? "Change cover" : "Add a cover"}</summary>
+                        <label htmlFor="cover-url">Cover image link</label>
+                        <input
+                            type="url"
+                            id="cover-url"
+                            placeholder="https://..."
+                            value={game.coverUrl || ""}
+                            onChange={(event) => onUpdateGameCover(game.id, event.target.value)}
+                        />
+                    </details>
+                </div>
+
+                {game.achievements.length === 0 && <p>No achievements yet</p>}
+
                 {game.achievements.map((achievement) => (
                     <AchievementCard
                         key={achievement.name}

@@ -202,7 +202,7 @@ main {
 }
 
 /* Phones */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .app-layout {
         grid-template-columns: 1fr;
     }
@@ -210,8 +210,18 @@ main {
     .sidebar {
         position: static;
         height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px 24px;
+        padding: 12px 16px;
         border-right: none;
         border-bottom: 2px solid var(--border);
+    }
+
+    .stat-card,
+    .sidebar-footer {
+        display: none;
     }
 
     .sidebar nav {
@@ -219,8 +229,15 @@ main {
         flex-wrap: wrap;
     }
 
-    .sidebar-footer {
-        display: none;
+    .sidebar nav a {
+        padding: 6px 10px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        border-radius: 6px 6px 0 0;
+    }
+
+    .sidebar nav a.active {
+        border-bottom-color: var(--accent);
     }
 
     main {
@@ -249,6 +266,7 @@ main {
 .game-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-auto-rows: 1fr;
     gap: 16px;
 }
 
@@ -279,12 +297,25 @@ main {
     background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 60%, black), var(--surface-raised));
 }
 
+.game-cover {
+    overflow: hidden;
+}
+
 .game-cover img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
+}
+
+.cover-backdrop {
     object-fit: cover;
+    filter: blur(16px) brightness(0.6);
+    transform: scale(1.2);
+}
+
+.cover-image {
+    object-fit: contain;
 }
 
 .game-info {
@@ -645,4 +676,116 @@ details summary {
     height: 8px;
     border-radius: 50%;
     background: var(--tier);
+}
+
+/* Game page Header */
+.bank-link {
+    display:inline-block;
+    margin-bottom: 16px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.game-header-cover {
+    flex-shrink: 0;
+    width: 180px;
+    overflow: hidden;
+    border-radius: 8px;
+    font-size: 2.5rem;
+}
+
+.game-header-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.game-header h2 {
+    margin: 0;
+    font-size: 2rem;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.game-header-stats {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.progress-ring.large {
+    width: 80px;
+    height: 80px;
+}
+
+.progress-ring.large span {
+    width: 64px;
+    height: 64px;
+    font-size: 1rem;
+}
+
+.game-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.add-panel > summary {
+    display: inline-block;
+    padding: 6px 14px;
+    list-style: none;
+    font-weight: 600;
+    color: var(--accent-text);
+    background: var(--accent);
+    border-radius: 6px;
+}
+
+.add-panel > summary::-webkit-details-marker {
+    display: none;
+}
+
+.add-panel[open] {
+    flex-basis: 100%;
+    padding: 16px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.add-panel[open] > summary {
+    margin-bottom: 12px;
+}
+
+@media (max-width: 900px) {
+    .game-header-cover {
+        width: 140px;
+    }
+}
+
+@media (max-width: 560px) {
+    .game-header {
+        flex-wrap: wrap;
+    }
+
+    .game-header-cover {
+        width: 100%;
+    }
 }
