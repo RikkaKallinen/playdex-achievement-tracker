@@ -115,7 +115,9 @@ function App() {
 
             const achievementsResponse = await fetch("/api/steam/achievements?steamId=" + profile.steamId + "&appId=" + steamGame.steamAppId);
             if (achievementsResponse.ok) {
-                steamGame.achievements = await achievementsResponse.json();
+                const achievementData = await achievementsResponse.json();
+                steamGame.achievements = achievementData.achievements;
+                steamGame.stats = achievementData.stats;
             }
         }
 
@@ -350,6 +352,7 @@ function App() {
                                 journalEntries={journalEntries}
                                 onAddJournalEntry={addJournalEntry}
                                 onDeleteJournalEntry={deleteJournalEntry}
+                                steamId={profile.steamId}
                             />
                         }
                     />

@@ -245,15 +245,14 @@ main {
 }
 
 .profile-tag {
-    margin: 0;
-    overflow: hidden;
+    margin: 4px 0 0;
     font-size: 0.8rem;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
     color: var(--text-muted);
 }
 
 .profile-platform {
+    display: block;
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -559,8 +558,79 @@ main {
     margin-top: 12px;
 }
 
-.achievement-card details {
+.achievement-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+    column-gap: 12px;
+}
+
+/* Each card shares the list's rows, so titles, descriptions, status lines and buttons line up across a row */
+.achievement-list .achievement-card {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    grid-template-rows: subgrid;
+    grid-row: span 5;
+    column-gap: 14px;
+}
+
+.achievement-list .achievement-body {
+    display: contents;
+}
+
+.achievement-list .achievement-icon {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+}
+
+.achievement-list .achievement-header,
+.achievement-list .achievement-description,
+.achievement-list .achievement-date,
+.achievement-list .achievement-note,
+.achievement-list .achievement-actions {
+    grid-column: 2;
+}
+
+.achievement-list .achievement-header { grid-row: 1; }
+.achievement-list .achievement-description { grid-row: 2; }
+.achievement-list .achievement-date { grid-row: 3; }
+.achievement-list .achievement-note { grid-row: 4; }
+
+.achievement-list .achievement-actions {
+    grid-row: 5;
+    align-self: start;
+}
+
+.achievement-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+}
+
+.achievement-progress .stat-bar {
+    display: block;
+    width: 80px;
+}
+
+.achievement-progress .stat-bar-fill {
+    display: block;
+}
+
+.achievement-edit[open] {
+    flex-basis: 100%;
+}
+
+.achievement-edit label,
+.achievement-edit input,
+.achievement-edit select {
+    display: block;
     margin-top: 8px;
+}
+
+.achievement-edit input,
+.achievement-edit select {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Trophy Tiers */

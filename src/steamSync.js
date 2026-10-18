@@ -12,7 +12,7 @@ export function mergeSteamGames(games, steamGames) {
             lastPlayed: steamMatch.lastPlayed,
             coverUrl: game.coverUrl || steamMatch.coverUrl,
             achievements: steamMatch.achievements
-                ? mergeAchievements(game.achievements, steamMatch.achievements)
+                ? mergeAchievements(game.achievements, steamMatch.achievements, steamMatch.stats)
                 : game.achievements
         };
     });
@@ -42,13 +42,29 @@ function isSameGame(game, steamGame) {
     return game.platform === "steam" && game.title.toLowerCase() === steamGame.title.toLowerCase();
 }
 
-function mergeAchievements(existingAchievements, steamAchievements) {
+function mergeAchievements(existingAchievements, steamAchievements, stats) {
     const synced = steamAchievements.map((steamAchievement) => {
         const existing = existingAchievements.find((achievement) =>
             achievement.steamApiName === steamAchievement.steamApiName || achievement.name === steamAchievement.name
         );
 
-        return existing ? { ...existing, ...steamAchievement } : steamAchievement;
+        if (!existing) {
+            return steamAchievement;
+        }
+
+        const merged = { ...existing, ...steamAchievement };
+        if (existing.progressPicked) {
+            merged.progressStat = existing.progressStat;
+            merged.progressTarget = existing.progressTarget;
+            merged.progressValue = existing.progressValue;
+        }
+
+        if (merged.progressStat && stats) {
+            const stat = stats.find((stat) => stat.name === merged.progressStat);
+            merged.progressValue = stat ? stat.value : 0;
+        }
+
+        return merged;
     });
 
     const manualOnly = existingAchievements.filter((achievement) =>
@@ -56,4 +72,13 @@ function mergeAchievements(existingAchievements, steamAchievements) {
     );
 
     return [...synced, ...manualOnly];
+}
+
+export async function fetchSteamStats(steamId, appId) {
+    try {
+        const response = await fetch("/api/steam/stats?steamId=" + steamId + "&appId=" + appId);
+        return response.ok ? await response.json() : [];
+    } catch {
+        return [];
+    }
 }

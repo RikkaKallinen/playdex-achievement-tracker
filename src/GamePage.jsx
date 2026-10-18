@@ -11,6 +11,7 @@ import GameCover from "./GameCover";
 import PlatformStat from "./PlatformStat";
 import ProgressRing from "./ProgressRing";
 import { countAchievements } from "./stats";
+import { fetchSteamStats } from "./steamSync";
 
 const filterOptions = [
     { type: "entry", label: "Journal entries" },
@@ -19,7 +20,7 @@ const filterOptions = [
     { type: "summary", label: "Session summaries" }
 ];
 
-function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievement, onUpdateGameCover, onAddJournalEntry, onDeleteJournalEntry }) {
+function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievement, onUpdateGameCover, onAddJournalEntry, onDeleteJournalEntry, steamId }) {
     const { gameId } = useParams();
     const game = games.find((game) => game.id === gameId);
     const [shownTypes, setShownTypes] = useState(filterOptions.map((option) => option.type));
@@ -148,15 +149,18 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
 
                 {game.achievements.length === 0 && <p>No achievements yet</p>}
 
-                {game.achievements.map((achievement) => (
-                    <AchievementCard
-                        key={achievement.name}
-                        achievement={achievement}
-                        onToggle={() => onToggleAchievement(game.id, achievement.name)}
-                        onDelete={() => onDeleteAchievement(game.id, achievement.name)}
-                        onUpdate={(changes) => onUpdateAchievement(game.id, achievement.name, changes)}
-                    />
-                ))}
+                <div className="achievement-list">
+                    {game.achievements.map((achievement) => (
+                        <AchievementCard
+                            key={achievement.name}
+                            achievement={achievement}
+                            onToggle={() => onToggleAchievement(game.id, achievement.name)}
+                            onDelete={() => onDeleteAchievement(game.id, achievement.name)}
+                            onUpdate={(changes) => onUpdateAchievement(game.id, achievement.name, changes)}
+                            onLoadStats={steamId && game.steamAppId ? () => fetchSteamStats(steamId, game.steamAppId) : null}
+                        />
+                    ))}
+                </div>
             </section>
 
             <section>
