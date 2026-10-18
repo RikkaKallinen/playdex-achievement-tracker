@@ -1,8 +1,10 @@
+import { useState } from "react";
 import AddGoalForm from "./AddGoalForm";
 import GoalCard from "./GoalCard";
 import { getGoalStatus } from "./goalStatus";
 
 function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpdateGoalProgress }) {
+    const [isAdding, setIsAdding] = useState(false);
     const inProgressGoals = goals.filter((goal) => !getGoalStatus(goal, games).completed);
     const completedGoals = goals.filter((goal) => getGoalStatus(goal, games).completed);
 
@@ -22,12 +24,22 @@ function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpda
     return (
         <section>
             <h2>Goals</h2>
-            <div className="game-header-actions">
-                <details className="add-panel">
-                    <summary>+ Add goal</summary>
-                    <AddGoalForm games={games.filter((game) => !game.deleted)} onAddGoal={onAddGoal} />
-                </details>
-            </div>
+            {isAdding ? (
+                <div className="add-panel">
+                    <AddGoalForm
+                        games={games.filter((game) => !game.deleted)}
+                        onAddGoal={(newGoal) => {
+                            onAddGoal(newGoal);
+                            setIsAdding(false);
+                        }}
+                        onCancel={() => setIsAdding(false)}
+                    />
+                </div>
+            ) : (
+                <div className="game-header-actions">
+                    <button type="button" onClick={() => setIsAdding(true)}>+ Add goal</button>
+                </div>
+            )}
 
             {goals.length === 0 && <p>No goals yet</p>}
 

@@ -23,6 +23,7 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
     const { gameId } = useParams();
     const game = games.find((game) => game.id === gameId);
     const [shownTypes, setShownTypes] = useState(filterOptions.map((option) => option.type));
+    const [isAdding, setIsAdding] = useState(false);
 
     function toggleShownType(type) {
         if (shownTypes.includes(type)) {
@@ -119,13 +120,9 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                 </div>
 
                 <div className="game-header-actions">
-                    <details className="add-panel">
-                        <summary>+ Add achievement</summary>
-                        <AddAchievementForm
-                            platform={game.platform}
-                            onAddAchievement={(newAchievement) => onAddAchievement(game.id, newAchievement)}
-                        />
-                    </details>
+                    {!isAdding && (
+                        <button type="button" onClick={() => setIsAdding(true)}>+ Add achievement</button>
+                    )}
                     <details>
                         <summary>{game.coverUrl ? "Change cover" : "Add a cover"}</summary>
                         <label htmlFor="cover-url">Cover image link</label>
@@ -138,6 +135,16 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                         />
                     </details>
                 </div>
+
+                {isAdding && (
+                    <div className="add-panel">
+                        <AddAchievementForm
+                            platform={game.platform}
+                            onAddAchievement={(newAchievement) => onAddAchievement(game.id, newAchievement)}
+                            onCancel={() => setIsAdding(false)}
+                        />
+                    </div>
+                )}
 
                 {game.achievements.length === 0 && <p>No achievements yet</p>}
 

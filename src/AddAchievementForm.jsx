@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { trophyTiers } from "./data";
 
-function AddAchievementForm({ platform, onAddAchievement }) {
+function AddAchievementForm({ platform, onAddAchievement, onCancel }) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [gamerscore, setGamerscore] = useState("");
@@ -86,7 +86,10 @@ function AddAchievementForm({ platform, onAddAchievement }) {
                 onChange={(event) => setIconUrl(event.target.value)}
             />
 
-            <button type="submit">Add achievement</button>
+            <div className="button-row">
+                <button type="submit">Add achievement</button>
+                <button type="button" className="button-quiet" onClick={onCancel}>Cancel</button>
+            </div>
         </form>
     );
 }

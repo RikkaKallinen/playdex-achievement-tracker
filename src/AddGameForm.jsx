@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function AddGameForm({ onAddGame }) {
+function AddGameForm({ onAddGame, onCancel }) {
     const [title, setTitle] = useState("");
     const [platform, setPlatform] = useState("steam");
     const [otherPlatform, setOtherPlatform] = useState("");
@@ -69,7 +69,10 @@ function AddGameForm({ onAddGame }) {
                 onChange={(event) => setCoverUrl(event.target.value)}
             />
 
-            <button type="submit">Add Game</button>
+            <div className="button-row">
+                <button type="submit">Add Game</button>
+                <button type="button" className="button-quiet" onClick={onCancel}>Cancel</button>
+            </div>
         </form>
     );
 }

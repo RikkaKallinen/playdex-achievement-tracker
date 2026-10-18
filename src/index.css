@@ -825,30 +825,12 @@ details summary {
     margin-bottom: 16px;
 }
 
-.add-panel > summary {
-    display: inline-block;
-    padding: 6px 14px;
-    list-style: none;
-    font-weight: 600;
-    color: var(--accent-text);
-    background: var(--accent);
-    border-radius: 6px;
-}
-
-.add-panel > summary::-webkit-details-marker {
-    display: none;
-}
-
-.add-panel[open] {
-    flex-basis: 100%;
+.add-panel {
     padding: 16px;
+    margin-bottom: 16px;
     background: var(--surface);
     border: 2px solid var(--border);
     border-radius: var(--radius);
-}
-
-.add-panel[open] > summary {
-    margin-bottom: 12px;
 }
 
 @media (max-width: 900px) {

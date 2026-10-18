@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function AddGoalForm({ games, onAddGoal }) {
+function AddGoalForm({ games, onAddGoal, onCancel }) {
     const [type, setType] = useState("open");
     const [text, setText] = useState("");
     const [gameId, setGameId] = useState("");
@@ -123,7 +123,10 @@ function AddGoalForm({ games, onAddGoal }) {
                 </>
             )}
 
-            <button type="submit">Add goal</button>
+            <div className="button-row">
+                <button type="submit">Add goal</button>
+                <button type="button" className="button-quiet" onClick={onCancel}>Cancel</button>
+            </div>
         </form>
     );
 }
