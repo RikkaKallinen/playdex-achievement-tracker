@@ -11,12 +11,13 @@ function GamesPage({ games, onAddGame, onDeleteGame, onRestoreGame }) {
     return (
         <>
             <section>
-                <h2>Add a game</h2>
-                <AddGameForm onAddGame={onAddGame} />
-            </section>
-
-            <section>
-                <h2>See their games</h2>
+                <h2>My games</h2>
+                <div className="game-header-actions">
+                    <details className="add-panel">
+                        <summary>+ Add game</summary>
+                        <AddGameForm onAddGame={onAddGame} />
+                    </details>
+                </div>
                 {activeGames.length === 0 && <p>No games yet</p>}
                 <div className="game-grid">
                     {activeGames.map((game) => (
