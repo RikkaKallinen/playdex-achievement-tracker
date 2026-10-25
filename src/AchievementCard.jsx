@@ -6,6 +6,7 @@ import { findTargetInDescription } from "./progressMatch";
 function AchievementCard({ achievement, onToggle, onDelete, onUpdate, onLoadStats }) {
     const [statOptions, setStatOptions] = useState(null);
 
+    const isSynced = achievement.source === "steam";
     const canTrackProgress = onLoadStats && achievement.source === "steam" && !achievement.earned;
     const showProgress = !achievement.earned && achievement.progressStat && achievement.progressTarget > 0;
     const progressPercent = showProgress
@@ -93,11 +94,17 @@ function AchievementCard({ achievement, onToggle, onDelete, onUpdate, onLoadStat
                 )}
 
                 <div className="achievement-actions">
-                    <label>
-                        <input type="checkbox" checked={achievement.earned} onChange={onToggle} />
-                        {" "}Unlocked
-                    </label>
-                    <button className="button-quiet" onClick={onDelete}>Delete</button>
+                    {isSynced ? (
+                        <span className="synced-note">Synced from Steam</span>
+                    ) : (
+                        <>
+                            <label>
+                                <input type="checkbox" checked={achievement.earned} onChange={onToggle} />
+                                {" "}Unlocked
+                            </label>
+                            <button className="button-quiet" onClick={onDelete}>Delete</button>
+                        </>
+                    )}
                     <details className="achievement-edit" onToggle={handleEditToggle}>
                         <summary>Edit</summary>
                         <label htmlFor={"note-" + achievement.name}>Note</label>

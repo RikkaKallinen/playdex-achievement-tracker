@@ -39,7 +39,7 @@ app.get("/api/steam/games", async (request, response) => {
 
     const games = await Promise.all(steamGames.map(async (steamGame) => ({
         steamAppId: steamGame.appid,
-        title: steamGame.name,
+        title: steamGame.name.trim(),
         playtimeMinutes: steamGame.playtime_forever,
         lastPlayed: steamGame.rtime_last_played > 0
             ? new Date(steamGame.rtime_last_played * 1000).toLocaleDateString("en-CA")

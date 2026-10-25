@@ -16,7 +16,8 @@ function App() {
         return savedGames ? JSON.parse(savedGames) : starterGames;
     });
 
-    const activeGames = games.filter((game) => !game.deleted);
+    const sortedGames = [...games].sort((a, b) => a.title.trim().localeCompare(b.title.trim(), undefined, { numeric: true }));
+    const activeGames = sortedGames.filter((game) => !game.deleted);
 
     useEffect(() => {
         localStorage.setItem("playdex-games", JSON.stringify(games));
@@ -330,7 +331,7 @@ function App() {
                         path="/"
                         element={
                             <GamesPage
-                                games={games}
+                                games={sortedGames}
                                 onAddGame={addGame}
                                 onDeleteGame={deleteGame}
                                 onRestoreGame={restoreGame}
@@ -341,7 +342,7 @@ function App() {
                         path="/games/:gameId"
                         element={
                             <GamePage
-                                games={games}
+                                games={sortedGames}
                                 onAddAchievement={addAchievement}
                                 onToggleAchievement={toggleAchievement}
                                 onDeleteAchievement={deleteAchievement}
@@ -361,7 +362,7 @@ function App() {
                         element={
                             <GoalsPage
                                 goals={goals}
-                                games={games}
+                                games={sortedGames}
                                 onAddGoal={addGoal}
                                 onToggleGoal={toggleGoal}
                                 onDeleteGoal={deleteGoal}
@@ -374,7 +375,7 @@ function App() {
                         element={
                             <SessionPage
                                 goals={goals}
-                                games={games}
+                                games={sortedGames}
                                 activeSession={activeSession}
                                 lastKeptGoalIds={lastKeptGoalIds}
                                 onStartSession={startSession}
