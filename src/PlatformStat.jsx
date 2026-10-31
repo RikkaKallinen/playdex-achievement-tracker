@@ -31,6 +31,16 @@ function PlatformStat({game}) {
         );
     }
 
+    if (game.platform === "steam" && typeof game.playtimeMinutes === "number") {
+        const hours = Math.round(game.playtimeMinutes / 6) / 10;
+
+        return (
+            <p className="title-gamerscore">
+                {hours}<span className="unit"> hrs played</span>
+            </p>
+        );
+    }
+
     return null;
 }
 
