@@ -5,16 +5,22 @@ function AddGameForm({ onAddGame, onCancel }) {
     const [platform, setPlatform] = useState("steam");
     const [otherPlatform, setOtherPlatform] = useState("");
     const [coverUrl, setCoverUrl] = useState("");
+    const [steamLink, setSteamLink] = useState("");
 
     function handleSubmit(event) {
         event.preventDefault();
+
+        const linkMatch = steamLink.match(/\/app\/(\d+)/);
+        const steamAppId = platform === "steam" && linkMatch ? Number(linkMatch[1]) : null;
+        const steamCoverUrl = steamAppId ? "https://cdn.cloudflare.steamstatic.com/steam/apps/" + steamAppId + "/header.jpg" : "";
 
         onAddGame({
             id: crypto.randomUUID(),
             title: title,
             platform: platform,
             otherPlatform: platform === "other" ? otherPlatform : "",
-            coverUrl: coverUrl,
+            coverUrl: coverUrl || steamCoverUrl,
+            steamAppId: steamAppId,
             achievements: []
         });
 
@@ -22,6 +28,7 @@ function AddGameForm({ onAddGame, onCancel }) {
         setPlatform("steam");
         setOtherPlatform("");
         setCoverUrl("");
+        setSteamLink("");
     }
 
     return (
@@ -56,6 +63,19 @@ function AddGameForm({ onAddGame, onCancel }) {
                         value={otherPlatform}
                         onChange={(event) => setOtherPlatform(event.target.value)}
                         required
+                    />
+                </>
+            )}
+
+            {platform === "steam" && (
+                <>
+                    <label htmlFor="steam-link">Steam store link (optional)</label>
+                    <input
+                        type="url"
+                        id="steam-link"
+                        placeholder="https://store.steampowered.com/app/..."
+                        value={steamLink}
+                        onChange={(event) => setSteamLink(event.target.value)}
                     />
                 </>
             )}

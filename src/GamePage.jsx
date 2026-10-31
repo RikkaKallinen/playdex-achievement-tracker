@@ -25,6 +25,7 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
     const game = games.find((game) => game.id === gameId);
     const [shownTypes, setShownTypes] = useState(filterOptions.map((option) => option.type));
     const [isAdding, setIsAdding] = useState(false);
+    const [achievementFilter, setAchievementFilter] = useState("all");
 
     function toggleShownType(type) {
         if (shownTypes.includes(type)) {
@@ -102,6 +103,24 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
     const counts = countAchievements([game]);
     const percent = counts.total > 0 ? Math.round((counts.unlocked / counts.total) * 100) : 0;
 
+    const achievementFilters = [
+        { value: "all", label: "All", count: counts.total },
+        { value: "unlocked", label: "Unlocked", count: counts.unlocked },
+        { value: "locked", label: "Locked", count: counts.total - counts.unlocked }
+    ];
+
+    const shownAchievements = game.achievements.filter((achievement) => {
+        if (achievementFilter === "unlocked") {
+            return achievement.earned;
+        }
+
+        if (achievementFilter === "locked") {
+            return !achievement.earned;
+        }
+
+        return true;
+    });
+
     return (
         <>
             <section>
@@ -149,8 +168,23 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
 
                 {game.achievements.length === 0 && <p>No achievements yet</p>}
 
+                {game.achievements.length > 0 && (
+                    <div className="filter-chips">
+                        {achievementFilters.map((filter) => (
+                            <button
+                                key={filter.value}
+                                type="button"
+                                className={filter.value === achievementFilter ? "chip selected" : "chip"}
+                                onClick={() => setAchievementFilter(filter.value)}
+                            >
+                                {filter.label} ({filter.count})
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 <div className="achievement-list">
-                    {game.achievements.map((achievement) => (
+                    {shownAchievements.map((achievement) => (
                         <AchievementCard
                             key={achievement.name}
                             achievement={achievement}

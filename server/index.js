@@ -6,25 +6,31 @@ const port = 3001;
 
 async function findCoverUrl(appId) {
     const simpleUrl = "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/header.jpg";
-    const simpleResponse = await fetch(simpleUrl, { method: "HEAD" });
-    if (simpleResponse.ok) {
+
+    try {
+        const simpleResponse = await fetch(simpleUrl, { method: "HEAD" });
+        if (simpleResponse.ok) {
+            return simpleUrl;
+        }
+
+        const storeResponse = await fetch("https://store.steampowered.com/api/appdetails?filters=basic&appids=" + appId);
+        if (!storeResponse.ok) {
+            return "";
+        }
+
+        const storeData = await storeResponse.json();
+        return storeData?.[appId]?.data?.header_image || "";
+    } catch {
         return simpleUrl;
     }
-
-    const storeResponse = await fetch("https://store.steampowered.com/api/appdetails?filters=basic&appids=" + appId);
-    if (!storeResponse.ok) {
-        return "";
-    }
-
-    const storeData = await storeResponse.json();
-    return storeData?.[appId]?.data?.header_image || "";
 }
 
 app.get("/api/steam/games", async (request, response) => {
     const params = new URLSearchParams({
         key: process.env.STEAM_API_KEY,
         steamid: request.query.steamId,
-        include_appinfo: "true"
+        include_appinfo: "true",
+        include_played_free_games: "true"
     });
 
     const steamResponse = await fetch("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?" + params);
@@ -35,7 +41,15 @@ app.get("/api/steam/games", async (request, response) => {
     }
 
     const data = await steamResponse.json();
-    const steamGames = data.response.games || [];
+    const ownedGames = data.response.games || [];
+
+    const recentResponse = await fetch("https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?" + params);
+    const recentData = recentResponse.ok ? await recentResponse.json() : {};
+    const familyGames = (recentData.response?.games || []).filter((recentGame) =>
+        !ownedGames.some((ownedGame) => ownedGame.appid === recentGame.appid)
+    );
+
+    const steamGames = [...ownedGames, ...familyGames];
 
     const games = await Promise.all(steamGames.map(async (steamGame) => ({
         steamAppId: steamGame.appid,

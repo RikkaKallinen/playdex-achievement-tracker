@@ -1,6 +1,7 @@
 import { starterGames } from "./data";
 import { mergeSteamGames } from "./steamSync";
 import { useState, useEffect } from "react";
+import { get, set } from "idb-keyval";
 import { Routes, Route } from "react-router";
 import GoalsPage from "./GoalsPage";
 import GamesPage from "./GamesPage";
@@ -11,17 +12,36 @@ import SettingsPage from "./SettingsPage";
 import Sidebar from "./Sidebar";
 
 function App() {
-    const [games, setGames] = useState(() => {
-        const savedGames = localStorage.getItem("playdex-games");
-        return savedGames ? JSON.parse(savedGames) : starterGames;
-    });
+    const [games, setGames] = useState([]);
+    const [gamesLoaded, setGamesLoaded] = useState(false);
+
+    useEffect(() => {
+        get("playdex-games").then((savedGames) => {
+            const oldGames = localStorage.getItem("playdex-games");
+            if (savedGames) {
+                setGames(savedGames);
+            } else if (oldGames) {
+                setGames(JSON.parse(oldGames));
+            } else {
+                setGames(starterGames);
+            }
+
+            setGamesLoaded(true);
+        });
+    }, []);
 
     const sortedGames = [...games].sort((a, b) => a.title.trim().localeCompare(b.title.trim(), undefined, { numeric: true }));
     const activeGames = sortedGames.filter((game) => !game.deleted);
 
     useEffect(() => {
-        localStorage.setItem("playdex-games", JSON.stringify(games));
-    }, [games]);
+        if (!gamesLoaded) {
+            return;
+        }
+
+        set("playdex-games", games)
+            .then(() => localStorage.removeItem("playdex-games"))
+            .catch((error) => console.error("Couldn't save your games", error));
+    }, [games, gamesLoaded]);
 
     const [goals, setGoals] = useState(() => {
         const savedGoals = localStorage.getItem("playdex-goals");
@@ -108,11 +128,22 @@ function App() {
         }
 
         const steamGames = await gamesResponse.json();
-        const playedGames = steamGames.filter((steamGame) => steamGame.playtimeMinutes > 0);
+        const missingGames = games.filter((game) =>
+            game.steamAppId && !steamGames.some((steamGame) => steamGame.steamAppId === game.steamAppId)
+        );
+        for (const game of missingGames) {
+            steamGames.push({
+                steamAppId: game.steamAppId,
+                title: game.title,
+                playtimeMinutes: game.playtimeMinutes,
+                lastPlayed: game.lastPlayed,
+                coverUrl: game.coverUrl
+            });
+        }
 
-        for (let index = 0; index < playedGames.length; index++) {
-            const steamGame = playedGames[index];
-            setSyncStatus("Getting achievements " + (index + 1) + " of " + playedGames.length + ": " + steamGame.title);
+        for (let index = 0; index < steamGames.length; index++) {
+            const steamGame = steamGames[index];
+            setSyncStatus("Getting achievements " + (index + 1) + " of " + steamGames.length + ": " + steamGame.title);
 
             const achievementsResponse = await fetch("/api/steam/achievements?steamId=" + profile.steamId + "&appId=" + steamGame.steamAppId);
             if (achievementsResponse.ok) {
@@ -319,6 +350,10 @@ function App() {
         } else {
             setHiddenPlatforms([...hiddenPlatforms, platform]);
         }
+    }
+
+    if (!gamesLoaded) {
+        return <p className="loading-message">Loading your games…</p>;
     }
 
     return (
