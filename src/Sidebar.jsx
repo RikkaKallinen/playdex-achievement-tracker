@@ -112,6 +112,22 @@ function Sidebar({ games, profile, goals, activeSession }) {
             )}
 
             <div className="sidebar-bottom">
+                <div className="sidebar-profile">
+                    <span className="avatar" aria-hidden="true">
+                        {profile.avatarUrl
+                            ? <img src={profile.avatarUrl} alt="" />
+                            : (profile.name || "Player").charAt(0).toUpperCase()}
+                    </span>
+                    <div className="profile-text">
+                        <p className="profile-name">{profile.name || "Player"}</p>
+                        {shownGamertags.map((gamertag) => (
+                            <p key={gamertag.id} className="profile-tag">
+                                <span className="profile-platform">{getPlatformText(gamertag)}</span> {gamertag.tag}
+                            </p>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="stat-card">
                     <div className="stat-grid">
                         <div>
@@ -127,22 +143,6 @@ function Sidebar({ games, profile, goals, activeSession }) {
                     </div>
                     <div className="stat-bar">
                         <div className="stat-bar-fill" style={{ width: percent + "%" }} />
-                    </div>
-                </div>
-
-                <div className="sidebar-profile">
-                    <span className="avatar" aria-hidden="true">
-                        {profile.avatarUrl
-                            ? <img src={profile.avatarUrl} alt="" />
-                            : (profile.name || "Player").charAt(0).toUpperCase()}
-                    </span>
-                    <div className="profile-text">
-                        <p className="profile-name">{profile.name || "Player"}</p>
-                        {shownGamertags.map((gamertag) => (
-                            <p key={gamertag.id} className="profile-tag">
-                                <span className="profile-platform">{getPlatformText(gamertag)}</span> {gamertag.tag}
-                            </p>
-                        ))}
                     </div>
                 </div>
 
