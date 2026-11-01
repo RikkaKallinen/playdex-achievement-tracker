@@ -48,12 +48,12 @@ function Sidebar({ games, profile }) {
                 <div className="stat-grid">
                     <div>
                         <p className="label">Games</p>
-                        <p className="stat-number">{games.length}</p>
+                        <p className="stat-number">{games.length.toLocaleString()}</p>
                     </div>
                     <div>
                         <p className="label">Achievements</p>
                         <p className="stat-number">
-                            {counts.unlocked}<span className="unit"> / {counts.total}</span>
+                            {counts.unlocked.toLocaleString()}<span className="unit"> / {counts.total.toLocaleString()}</span>
                         </p>
                     </div>
                 </div>
