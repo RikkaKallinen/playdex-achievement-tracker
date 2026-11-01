@@ -1,4 +1,5 @@
-import { Link, NavLink } from "react-router";
+import { useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router";
 import { ChartColumn, Gamepad2, Settings, Target, Zap } from "lucide-react";
 import { getPlatformText } from "./data";
 import { countAchievements } from "./stats";
@@ -13,6 +14,33 @@ const navLinks = [
 ];
 
 function Sidebar({ games, profile, goals, activeSession }) {
+    const navigate = useNavigate();
+    const [search, setSearch] = useState("");
+
+    function openGame(game) {
+        navigate("/games/" + game.id);
+        setSearch("");
+    }
+
+    function handleSearchChange(event) {
+        const typed = event.target.value;
+        const exactMatch = games.find((game) => game.title === typed);
+        if (exactMatch) {
+            openGame(exactMatch);
+            return;
+        }
+
+        setSearch(typed);
+    }
+
+    function handleSearchSubmit(event) {
+        event.preventDefault();
+        const firstMatch = games.find((game) => game.title.toLowerCase().includes(search.trim().toLowerCase()));
+        if (search.trim() && firstMatch) {
+            openGame(firstMatch);
+        }
+    }
+
     const shownGamertags = profile.gamertags.filter((gamertag) => gamertag.shown && gamertag.tag);
     const counts = countAchievements(games);
     const percent = counts.total > 0 ? Math.round((counts.unlocked / counts.total) * 100) : 0;
@@ -68,6 +96,22 @@ function Sidebar({ games, profile, goals, activeSession }) {
                     <div className="stat-bar-fill" style={{ width: percent + "%" }} />
                 </div>
             </div>
+
+            <form className="game-search" role="search" onSubmit={handleSearchSubmit}>
+                <input
+                    type="search"
+                    aria-label="Find a game"
+                    placeholder="Find a game..."
+                    list="sidebar-game-options"
+                    value={search}
+                    onChange={handleSearchChange}
+                />
+                <datalist id="sidebar-game-options">
+                    {games.map((game) => (
+                        <option key={game.id} value={game.title} />
+                    ))}
+                </datalist>
+            </form>
 
             <nav>
                 {navLinks.map(({ to, label, Icon }) => (
