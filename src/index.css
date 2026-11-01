@@ -245,12 +245,28 @@ main {
     margin: 0;
 }
 
+.period-panel {
+    padding: 20px;
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+    border-radius: calc(var(--radius) + 4px);
+}
+
+.summary-heading {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.summary-heading-note {
+    margin: 4px 0 16px;
+}
+
 .summary-section {
     margin-top: 40px;
 }
 
-.summary-section > .label {
-    margin-bottom: 12px;
+.summary-section > .summary-heading + .platform-cards {
+    margin-top: 16px;
 }
 
 .summary-card {

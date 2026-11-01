@@ -84,59 +84,62 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
             <section>
                 <h2>Summary</h2>
 
-                <div className="filter-chips">
-                    {periods.map((option) => (
-                        <button
-                            key={option.value}
-                            type="button"
-                            className={option.value === period ? "chip selected" : "chip"}
-                            onClick={() => setPeriod(option.value)}
-                        >
-                            {option.label}
-                        </button>
-                    ))}
-                </div>
+                <div className="period-panel">
+                    <div className="filter-chips">
+                        {periods.map((option) => (
+                            <button
+                                key={option.value}
+                                type="button"
+                                className={option.value === period ? "chip selected" : "chip"}
+                                onClick={() => setPeriod(option.value)}
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
 
-                <div className="stat-tiles">
-                    {tiles.map((tile) => (
-                        <div key={tile.label} className="stat-tile">
-                            <p className="label">{tile.label}</p>
-                            <p className="stat-tile-value">{tile.value}</p>
-                            {tile.detail && <p className="stat-detail">{tile.detail}</p>}
-                        </div>
-                    ))}
-                </div>
+                    <div className="stat-tiles">
+                        {tiles.map((tile) => (
+                            <div key={tile.label} className="stat-tile">
+                                <p className="label">{tile.label}</p>
+                                <p className="stat-tile-value">{tile.value}</p>
+                                {tile.detail && <p className="stat-detail">{tile.detail}</p>}
+                            </div>
+                        ))}
+                    </div>
 
-                <div className="summary-card">
-                    <ActivityChart buckets={getActivityBuckets(allUnlocks, period)} period={period} />
-                </div>
+                    <div className="summary-card">
+                        <ActivityChart buckets={getActivityBuckets(allUnlocks, period)} period={period} />
+                    </div>
 
-                <div className="summary-card">
-                    <h3 className="label">Recent unlocks</h3>
-                    {periodUnlocks.length === 0 ? (
-                        <p className="stat-detail">Nothing unlocked {period === "all" ? "yet" : periods.find((option) => option.value === period).label.toLowerCase()}. Go get some!</p>
-                    ) : (
-                        <ul className="recent-unlocks">
-                            {periodUnlocks.slice(0, 8).map(({ game, achievement, date }) => (
-                                <li key={game.id + achievement.name}>
-                                    <Link to={"/games/" + game.id} className="recent-unlock">
-                                        <span className="achievement-icon recent-unlock-icon" aria-hidden="true">
-                                            {achievement.iconUrl ? <img src={achievement.iconUrl} alt="" /> : "🏆"}
-                                        </span>
-                                        <span className="recent-unlock-text">
-                                            <span className="recent-unlock-name">{achievement.name}</span>
-                                            <span className="stat-detail">{game.title} · {formatDate(date)}</span>
-                                        </span>
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                    <div className="summary-card">
+                        <h3 className="label">Recent unlocks</h3>
+                        {periodUnlocks.length === 0 ? (
+                            <p className="stat-detail">Nothing unlocked {period === "all" ? "yet" : periods.find((option) => option.value === period).label.toLowerCase()}. Go get some!</p>
+                        ) : (
+                            <ul className="recent-unlocks">
+                                {periodUnlocks.slice(0, 8).map(({ game, achievement, date }) => (
+                                    <li key={game.id + achievement.name}>
+                                        <Link to={"/games/" + game.id} className="recent-unlock">
+                                            <span className="achievement-icon recent-unlock-icon" aria-hidden="true">
+                                                {achievement.iconUrl ? <img src={achievement.iconUrl} alt="" /> : "🏆"}
+                                            </span>
+                                            <span className="recent-unlock-text">
+                                                <span className="recent-unlock-name">{achievement.name}</span>
+                                                <span className="stat-detail">{game.title} · {formatDate(date)}</span>
+                                            </span>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 </div>
             </section>
 
             <section className="summary-section">
-                <h3 className="label">Highlights · all time</h3>
+                <h2 className="summary-heading">All-time highlights</h2>
+                <p className="stat-detail summary-heading-note">Your whole history. Not affected by the period above.</p>
                 <div className="highlight-grid">
                     <div className="summary-card">
                         <h3 className="label">Most played</h3>
@@ -202,7 +205,7 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
 
             {platformSections.length > 0 && (
                 <section className="summary-section">
-                    <h3 className="label">By platform</h3>
+                    <h2 className="summary-heading">By platform</h2>
                     <div className="platform-cards">
                         {platformSections.map((section) => {
                             const counts = countAchievements(section.games);
