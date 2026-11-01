@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 import { getGoalStatus } from "./goalStatus";
 import { formatDate } from "./formatDate";
 
-function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
+function GoalCard({ goal, games, showGame = true, onToggle, onDelete, onProgressChange }) {
     const { game, completed, completedDate } = getGoalStatus(goal, games);
 
     const cardClass = completed
@@ -14,7 +14,7 @@ function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
             <div className="goal-header">
                 <h3>{goal.text}</h3>
                 <div className="goal-pills">
-                    {game && <span className="badge badge-game">{game.title}</span>}
+                    {showGame && game && <span className="badge badge-game">{game.title}</span>}
                     {goal.type === "achievement" && <span className="badge badge-muted">Achievement</span>}
                 </div>
                 <button

@@ -14,11 +14,53 @@ function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpda
                 key={goal.id}
                 goal={goal}
                 games={games}
+                showGame={false}
                 onToggle={() => onToggleGoal(goal.id)}
                 onDelete={() => onDeleteGoal(goal.id)}
                 onProgressChange={(newProgress) => onUpdateGoalProgress(goal.id, newProgress)}
             />
         );
+    }
+
+    function groupByGame(goalList) {
+        const groups = [];
+
+        for (const goal of goalList) {
+            const key = goal.gameId || "none";
+            let group = groups.find((existingGroup) => existingGroup.key === key);
+
+            if (!group) {
+                const game = games.find((game) => game.id === goal.gameId);
+                group = { key: key, title: game ? game.title : "No game", goals: [] };
+                groups.push(group);
+            }
+
+            group.goals.push(goal);
+        }
+
+        return groups.sort((a, b) => {
+            if (a.key === "none") {
+                return 1;
+            }
+
+            if (b.key === "none") {
+                return -1;
+            }
+
+            return a.title.localeCompare(b.title);
+        });
+    }
+
+    function renderGroups(goalList) {
+        return groupByGame(goalList).map((group) => (
+            <div key={group.key} className="goal-group">
+                <h4 className="goal-group-title">
+                    {group.title}
+                    <span className="goal-group-count">{group.goals.length}</span>
+                </h4>
+                {group.goals.map(renderGoalCard)}
+            </div>
+        ));
     }
 
     return (
@@ -46,14 +88,14 @@ function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpda
             {inProgressGoals.length > 0 && (
                 <>
                     <h3 className="label">In progress ({inProgressGoals.length})</h3>
-                    {inProgressGoals.map(renderGoalCard)}
+                    {renderGroups(inProgressGoals)}
                 </>
             )}
 
             {completedGoals.length > 0 && (
                 <>
                     <h3 className="label">Completed ({completedGoals.length})</h3>
-                    {completedGoals.map(renderGoalCard)}
+                    {renderGroups(completedGoals)}
                 </>
             )}
         </section>

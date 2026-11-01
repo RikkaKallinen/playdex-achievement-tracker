@@ -410,6 +410,32 @@ main {
     background: var(--surface-raised);
 }
 
+.goal-group-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 24px 0 10px;
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    color: var(--text);
+}
+
+.goal-group-title::before {
+    content: "";
+    width: 4px;
+    height: 1.2em;
+    border-radius: 2px;
+    background: var(--accent);
+}
+
+.goal-group-count {
+    padding: 0 8px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: var(--surface-raised);
+    border-radius: 999px;
+}
+
 /* Game Tiles */
 .game-grid {
     display: grid;
