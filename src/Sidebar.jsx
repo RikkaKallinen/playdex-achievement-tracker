@@ -1,7 +1,8 @@
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 import { ChartColumn, Gamepad2, Settings, Target, Zap } from "lucide-react";
 import { getPlatformText } from "./data";
 import { countAchievements } from "./stats";
+import { getGoalStatus } from "./goalStatus";
 
 const navLinks = [
     { to: "/", label: "Games", Icon: Gamepad2 },
@@ -11,10 +12,16 @@ const navLinks = [
     { to: "/settings", label: "Settings", Icon: Settings }
 ];
 
-function Sidebar({ games, profile }) {
+function Sidebar({ games, profile, goals, activeSession }) {
     const shownGamertags = profile.gamertags.filter((gamertag) => gamertag.shown && gamertag.tag);
     const counts = countAchievements(games);
     const percent = counts.total > 0 ? Math.round((counts.unlocked / counts.total) * 100) : 0;
+
+    const inProgressCount = goals.filter((goal) => !getGoalStatus(goal, games).completed).length;
+    const sessionGoals = activeSession
+        ? goals.filter((goal) => activeSession.goalIds.includes(goal.id))
+        : [];
+    const sessionGoalsDone = sessionGoals.filter((goal) => getGoalStatus(goal, games).completed).length;
 
     return (
         <aside className="sidebar">
@@ -67,9 +74,32 @@ function Sidebar({ games, profile }) {
                     <NavLink key={to} to={to} end={to === "/"}>
                         <Icon size={18} aria-hidden="true" />
                         {label}
+                        {to === "/goals" && inProgressCount > 0 && (
+                            <span className="nav-badge" aria-label={inProgressCount + " in progress"}>{inProgressCount}</span>
+                        )}
+                        {to === "/session" && activeSession && (
+                            <span className="live-dot" aria-label="Session in progress" />
+                        )}
                     </NavLink>
                 ))}
             </nav>
+
+            {activeSession ? (
+                <Link to="/session" className="session-card live">
+                    <span className="label">Session in progress</span>
+                    <span className="session-card-text">
+                        {sessionGoals.length > 0
+                            ? sessionGoalsDone + " of " + sessionGoals.length + " goals done"
+                            : "No goals picked"}
+                    </span>
+                    <span className="session-card-link">Back to session →</span>
+                </Link>
+            ) : (
+                <Link to="/session" className="session-card">
+                    <span className="session-card-text">Ready to play?</span>
+                    <span className="session-card-link">Start a session →</span>
+                </Link>
+            )}
 
             <p className="label sidebar-footer">All data stored locally</p>
         </aside>

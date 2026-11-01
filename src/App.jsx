@@ -374,7 +374,7 @@ function App() {
 
     return (
         <div className="app-layout">
-            <Sidebar games={activeGames} profile={profile} />
+            <Sidebar games={activeGames} profile={profile} goals={goals} activeSession={activeSession} />
 
             <main>
                 <Routes>
