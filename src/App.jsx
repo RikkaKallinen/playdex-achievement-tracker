@@ -439,7 +439,7 @@ function App() {
                     />
                     <Route
                         path="/summary"
-                        element={<SummaryPage games={activeGames} hiddenPlatforms={hiddenPlatforms} />}
+                        element={<SummaryPage games={activeGames} goals={goals} hiddenPlatforms={hiddenPlatforms} />}
                     />
                     <Route
                         path="/settings"

@@ -177,6 +177,73 @@ main {
     background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 40%, white));
 }
 
+.stat-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.stat-tile,
+.platform-card {
+    padding: 16px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.stat-tile-value {
+    margin: 6px 0 0;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-detail {
+    margin: 6px 0 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.platform-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.platform-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.platform-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.platform-card-games {
+    margin: 6px 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.platform-card-stat {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+}
+
+.platform-card .stat-detail {
+    margin: 0;
+}
+
 .sidebar nav {
     display: flex;
     flex-direction: column;
@@ -359,6 +426,7 @@ main {
 @media (max-width: 900px) {
     .app-layout {
         grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
     }
 
     .sidebar {
