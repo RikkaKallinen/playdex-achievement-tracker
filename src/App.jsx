@@ -270,6 +270,13 @@ function App() {
     function toggleGoal(goalId) {
         const goalToToggle = goals.find((goal) => goal.id === goalId);
         if (goalToToggle.type === "achievement") {
+            const goalGame = games.find((game) => game.id === goalToToggle.gameId);
+            const linkedAchievement = goalGame?.achievements.find((achievement) => achievement.name === goalToToggle.achievementName);
+            if (linkedAchievement?.source === "steam") {
+                alert("This achievement will update after your next Steam sync.");
+                return;
+            }
+
             toggleAchievement(goalToToggle.gameId, goalToToggle.achievementName);
             return;
         }

@@ -338,6 +338,72 @@ main {
     box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
+.goal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.goal-header h3 {
+    margin: 0;
+}
+
+.goal-card.completed h3 {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.goal-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.goal-pills:empty {
+    display: none;
+}
+
+.badge-muted {
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+.goal-status {
+    margin: 8px 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.goal-card.completed .goal-status {
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.goal-actions {
+    margin-top: 12px;
+}
+
+.goal-actions progress {
+    display: block;
+    margin-top: 6px;
+}
+
+.icon-button {
+    display: grid;
+    place-items: center;
+    padding: 4px;
+    color: var(--text-muted);
+    background: transparent;
+    border-radius: 6px;
+}
+
+.icon-button:hover {
+    color: var(--text);
+    background: var(--surface-raised);
+}
+
 /* Game Tiles */
 .game-grid {
     display: grid;
@@ -559,6 +625,12 @@ main {
 }
 
 .synced-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.field-hint {
+    margin: 0 0 8px;
     font-size: 0.85rem;
     color: var(--text-muted);
 }

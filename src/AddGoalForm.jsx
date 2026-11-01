@@ -4,6 +4,7 @@ function AddGoalForm({ games, onAddGoal, onCancel }) {
     const [type, setType] = useState("open");
     const [text, setText] = useState("");
     const [gameId, setGameId] = useState("");
+    const [gameSearch, setGameSearch] = useState("");
     const [achievementName, setAchievementName] = useState("");
     const [target, setTarget] = useState("");
 
@@ -42,6 +43,7 @@ function AddGoalForm({ games, onAddGoal, onCancel }) {
 
         setText("");
         setGameId("");
+        setGameSearch("");
         setAchievementName("");
         setTarget("");
     }
@@ -74,22 +76,29 @@ function AddGoalForm({ games, onAddGoal, onCancel }) {
             <label htmlFor="goal-game">
                 {type === "achievement" ? "Game" : "Game (optional)"}
             </label>
-            <select
+            <input
+                type="text"
                 id="goal-game"
-                value={gameId}
+                list="goal-game-options"
+                placeholder="Start typing a game..."
+                value={gameSearch}
                 onChange={(event) => {
-                    setGameId(event.target.value);
+                    const typed = event.target.value;
+                    const match = games.find((game) => game.title === typed);
+                    setGameSearch(typed);
+                    setGameId(match ? match.id : "");
                     setAchievementName("");
                 }}
                 required={type === "achievement"}
-            >
-                <option value="">
-                    {type === "achievement" ? "Pick a game" : "No game"}
-                </option>
+            />
+            <datalist id="goal-game-options">
                 {games.map((game) => (
-                    <option key={game.id} value={game.id}>{game.title}</option>
+                    <option key={game.id} value={game.title} />
                 ))}
-            </select>
+            </datalist>
+            {gameSearch && !selectedGame && (
+                <p className="field-hint">No game called "{gameSearch}" yet. Pick one from the list.</p>
+            )}
 
             {type === "achievement" && (
                 <>

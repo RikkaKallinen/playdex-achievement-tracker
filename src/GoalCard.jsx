@@ -1,4 +1,6 @@
+import { X } from "lucide-react";
 import { getGoalStatus } from "./goalStatus";
+import { formatDate } from "./formatDate";
 
 function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
     const { game, completed, completedDate } = getGoalStatus(goal, games);
@@ -7,20 +9,35 @@ function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
         ? "goal-card completed"
         : "goal-card";
 
-    const formattedDate = completed
-        ? new Date(completedDate + "T00:00").toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric"
-        })
-        : null;
-
     return (
         <article className={cardClass}>
-            <h3>{goal.text}</h3>
-            {game && <p>{game.title}</p>}
-            {goal.target ? (
-                <>
+            <div className="goal-header">
+                <h3>{goal.text}</h3>
+                <button
+                    type="button"
+                    className="icon-button"
+                    onClick={onDelete}
+                    aria-label={"Delete goal: " + goal.text}
+                >
+                    <X size={16} aria-hidden="true" />
+                </button>
+            </div>
+
+            <div className="goal-pills">
+                {game && <span className="badge">{game.title}</span>}
+                {goal.type === "achievement" && <span className="badge badge-muted">Achievement</span>}
+            </div>
+
+            <p className="goal-status">
+                {completed ? (
+                    <>✓ Completed <time dateTime={completedDate}>{formatDate(completedDate)}</time></>
+                ) : (
+                    "Not completed yet"
+                )}
+            </p>
+
+            <div className="goal-actions">
+                {goal.target ? (
                     <label>
                         Progress{" "}
                         <input
@@ -31,21 +48,15 @@ function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
                             onChange={(event) => onProgressChange(Number(event.target.value))}
                         />
                         {" "}/ {goal.target}
+                        <progress value={goal.progress} max={goal.target} />
                     </label>
-                    <progress value={goal.progress} max={goal.target} />
-                </>
-            ) : (
-                <label>
-                    <input type="checkbox" checked={completed} onChange={onToggle} />
-                    {" "}Completed
-                </label>
-            )}
-            <button onClick={onDelete}>Delete</button>
-            {completed && (
-                <p>
-                    Completed on <time dateTime={completedDate}>{formattedDate}</time>
-                </p>
-            )}
+                ) : (
+                    <label>
+                        <input type="checkbox" checked={completed} onChange={onToggle} />
+                        {" "}Mark complete
+                    </label>
+                )}
+            </div>
         </article>
     );
 }
