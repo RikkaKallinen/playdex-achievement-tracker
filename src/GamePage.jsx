@@ -131,6 +131,13 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                     <div className="game-header-info">
                         <h2>{game.title}</h2>
                         <p className="badge">{getPlatformText(game)}</p>
+                        {game.genres && game.genres.length > 0 && (
+                            <div className="genre-pills">
+                                {game.genres.map((genre) => (
+                                    <span key={genre} className="badge badge-muted">{genre}</span>
+                                ))}
+                            </div>
+                        )}
                         <p className="game-header-stats">
                             {counts.unlocked} / {counts.total} achievements · {percent}% complete
                         </p>

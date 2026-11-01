@@ -852,6 +852,13 @@ main {
     display: none;
 }
 
+.genre-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
 .badge.badge-game {
     color: var(--accent-text);
     background: var(--accent);
