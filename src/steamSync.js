@@ -11,6 +11,7 @@ export function mergeSteamGames(games, steamGames) {
             playtimeMinutes: steamMatch.playtimeMinutes,
             lastPlayed: steamMatch.lastPlayed,
             coverUrl: game.coverUrl || steamMatch.coverUrl,
+            genres: steamMatch.genres || game.genres,
             achievements: steamMatch.achievements
                 ? mergeAchievements(game.achievements, steamMatch.achievements, steamMatch.stats)
                 : game.achievements
@@ -28,6 +29,7 @@ export function mergeSteamGames(games, steamGames) {
             steamAppId: steamGame.steamAppId,
             playtimeMinutes: steamGame.playtimeMinutes,
             lastPlayed: steamGame.lastPlayed,
+            genres: steamGame.genres,
             achievements: steamGame.achievements || []
         }));
 

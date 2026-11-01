@@ -162,6 +162,26 @@ function App() {
             }
         }
 
+        const gamesNeedingGenres = steamGames.filter((steamGame) => {
+            const playdexGame = games.find((game) => game.steamAppId === steamGame.steamAppId);
+            return !playdexGame || !playdexGame.genres;
+        });
+
+        for (let index = 0; index < gamesNeedingGenres.length; index += 25) {
+            const chunk = gamesNeedingGenres.slice(index, index + 25);
+            setSyncStatus("Getting genres " + Math.min(index + 25, gamesNeedingGenres.length) + " of " + gamesNeedingGenres.length);
+
+            const genresResponse = await fetch("/api/steam/genres?appIds=" + chunk.map((steamGame) => steamGame.steamAppId).join(","));
+            if (genresResponse.ok) {
+                const genres = await genresResponse.json();
+                for (const steamGame of chunk) {
+                    if (genres[steamGame.steamAppId]) {
+                        steamGame.genres = genres[steamGame.steamAppId];
+                    }
+                }
+            }
+        }
+
         setGames((currentGames) => mergeSteamGames(currentGames, steamGames));
         setSyncStatus("Synced " + steamGames.length + " games from Steam.");
         setIsSyncing(false);
@@ -439,7 +459,7 @@ function App() {
                     />
                     <Route
                         path="/summary"
-                        element={<SummaryPage games={activeGames} goals={goals} hiddenPlatforms={hiddenPlatforms} />}
+                        element={<SummaryPage games={activeGames} goals={goals} sessions={sessions} hiddenPlatforms={hiddenPlatforms} />}
                     />
                     <Route
                         path="/settings"

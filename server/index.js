@@ -153,6 +153,31 @@ app.get("/api/steam/stats", async (request, response) => {
     response.json(await getStats(params, schemaData));
 });
 
+app.get("/api/steam/genres", async (request, response) => {
+    const appIds = String(request.query.appIds || "").split(",").filter((appId) => appId);
+    const genres = {};
+
+    for (const appId of appIds) {
+        try {
+            const storeResponse = await fetch("https://store.steampowered.com/api/appdetails?filters=genres&appids=" + appId);
+            if (storeResponse.status === 429) {
+                break;
+            }
+
+            if (!storeResponse.ok) {
+                continue;
+            }
+
+            const storeData = await storeResponse.json();
+            genres[appId] = (storeData?.[appId]?.data?.genres || []).map((genre) => genre.description);
+        } catch {
+            continue;
+        }
+    }
+
+    response.json(genres);
+});
+
 app.listen(port, () => {
     console.log("Playdex server running on http://localhost:" + port);
 });

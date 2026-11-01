@@ -184,7 +184,8 @@ main {
 }
 
 .stat-tile,
-.platform-card {
+.platform-card,
+.summary-card {
     padding: 16px;
     background: var(--surface);
     border: 2px solid var(--border);
@@ -242,6 +243,346 @@ main {
 
 .platform-card .stat-detail {
     margin: 0;
+}
+
+.summary-section {
+    margin-top: 40px;
+}
+
+.summary-section > .label {
+    margin-bottom: 12px;
+}
+
+.summary-card {
+    margin-top: 12px;
+}
+
+.summary-card > .label {
+    margin-bottom: 12px;
+}
+
+/* Activity chart */
+.activity-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.activity-header .stat-detail {
+    margin: 0;
+}
+
+.activity-bars {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+}
+
+.activity-column {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    outline: none;
+}
+
+.activity-column:focus-visible .activity-bar-area {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.activity-bar-area {
+    display: flex;
+    align-items: flex-end;
+    height: 140px;
+    border-bottom: 1px solid var(--border);
+}
+
+.activity-bar {
+    width: 100%;
+    min-height: 3px;
+    border-radius: 4px 4px 0 0;
+    background: var(--accent);
+}
+
+.activity-hint {
+    margin: 12px 0 0;
+}
+
+.activity-column.active .activity-bar {
+    filter: brightness(1.2);
+}
+
+.activity-tooltip {
+    position: absolute;
+    bottom: calc(100% - 20px);
+    z-index: 10;
+    width: 240px;
+    padding: 12px 14px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+    pointer-events: none;
+}
+
+.activity-tooltip.center {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.activity-tooltip.left {
+    left: 0;
+}
+
+.activity-tooltip.right {
+    right: 0;
+}
+
+.activity-tooltip-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 10px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+
+.activity-tooltip-title span {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.activity-tooltip ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.activity-tooltip li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3px 10px;
+    font-size: 0.85rem;
+}
+
+.activity-tooltip-game {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.activity-tooltip-count {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.activity-tooltip-bar {
+    grid-column: 1 / -1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--accent);
+}
+
+.activity-tooltip-more {
+    margin: 10px 0 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.activity-label {
+    height: 1.4em;
+    margin-top: 6px;
+    overflow: hidden;
+    font-size: 0.7rem;
+    text-align: center;
+    white-space: nowrap;
+    color: var(--text-muted);
+}
+
+/* Recent unlocks */
+.recent-unlocks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.recent-unlock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    text-decoration: none;
+    color: var(--text);
+    border-radius: 8px;
+}
+
+.recent-unlock:hover {
+    background: var(--surface-raised);
+}
+
+.recent-unlock-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+}
+
+.recent-unlock-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.recent-unlock-name {
+    overflow: hidden;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.recent-unlock-text .stat-detail {
+    margin: 2px 0 0;
+}
+
+/* Highlights */
+.highlight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.highlight-grid .summary-card {
+    margin-top: 0;
+}
+
+.highlight-tiles {
+    display: grid;
+    gap: 12px;
+}
+
+.ranked-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ranked-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 6px 8px;
+    text-decoration: none;
+    color: var(--text);
+    border-radius: 8px;
+}
+
+.ranked-row:hover {
+    background: var(--surface-raised);
+}
+
+.ranked-title {
+    overflow: hidden;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.ranked-value {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+}
+
+.ranked-bar,
+.ranked-note {
+    grid-column: 1 / -1;
+}
+
+.ranked-bar .stat-bar-fill {
+    display: block;
+}
+
+.ranked-note {
+    margin: 0;
+}
+
+/* Genre donut */
+.genre-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+}
+
+.genre-donut {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+}
+
+.genre-donut circle:hover {
+    filter: brightness(1.2);
+}
+
+.genre-total {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    font-weight: 700;
+    fill: var(--text);
+}
+
+.genre-total-label {
+    font-size: 12px;
+    fill: var(--text-muted);
+}
+
+.genre-legend {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 140px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.genre-legend li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.genre-swatch {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    border-radius: 3px;
+}
+
+.genre-name {
+    flex: 1;
+}
+
+.genre-count {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
 }
 
 .sidebar nav {
