@@ -5,8 +5,15 @@ import { getGoalStatus } from "./goalStatus";
 
 function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpdateGoalProgress }) {
     const [isAdding, setIsAdding] = useState(false);
+    const [shownTab, setShownTab] = useState("inProgress");
     const inProgressGoals = goals.filter((goal) => !getGoalStatus(goal, games).completed);
     const completedGoals = goals.filter((goal) => getGoalStatus(goal, games).completed);
+
+    const tabs = [
+        { value: "inProgress", label: "In progress", count: inProgressGoals.length },
+        { value: "completed", label: "Completed", count: completedGoals.length }
+    ];
+    const shownGoals = shownTab === "completed" ? completedGoals : inProgressGoals;
 
     function renderGoalCard(goal) {
         return (
@@ -85,19 +92,24 @@ function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpda
 
             {goals.length === 0 && <p>No goals yet</p>}
 
-            {inProgressGoals.length > 0 && (
-                <>
-                    <h3 className="label">In progress ({inProgressGoals.length})</h3>
-                    {renderGroups(inProgressGoals)}
-                </>
+            {goals.length > 0 && (
+                <div className="filter-chips">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.value}
+                            type="button"
+                            className={tab.value === shownTab ? "chip selected" : "chip"}
+                            onClick={() => setShownTab(tab.value)}
+                        >
+                            {tab.label} ({tab.count})
+                        </button>
+                    ))}
+                </div>
             )}
 
-            {completedGoals.length > 0 && (
-                <>
-                    <h3 className="label">Completed ({completedGoals.length})</h3>
-                    {renderGroups(completedGoals)}
-                </>
-            )}
+            {goals.length > 0 && shownGoals.length === 0 && <p>Nothing here yet</p>}
+
+            {renderGroups(shownGoals)}
         </section>
     );
 }

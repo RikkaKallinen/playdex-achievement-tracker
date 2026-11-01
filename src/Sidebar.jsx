@@ -63,40 +63,6 @@ function Sidebar({ games, profile, goals, activeSession }) {
                 </div>
             </div>
 
-            <div className="sidebar-profile">
-                <span className="avatar" aria-hidden="true">
-                    {profile.avatarUrl
-                        ? <img src={profile.avatarUrl} alt="" />
-                        : (profile.name || "Player").charAt(0).toUpperCase()}
-                </span>
-                <div className="profile-text">
-                    <p className="profile-name">{profile.name || "Player"}</p>
-                    {shownGamertags.map((gamertag) => (
-                        <p key={gamertag.id} className="profile-tag">
-                            <span className="profile-platform">{getPlatformText(gamertag)}</span> {gamertag.tag}
-                        </p>
-                    ))}
-                </div>
-            </div>
-
-            <div className="stat-card">
-                <div className="stat-grid">
-                    <div>
-                        <p className="label">Games</p>
-                        <p className="stat-number">{games.length.toLocaleString()}</p>
-                    </div>
-                    <div>
-                        <p className="label">Achievements</p>
-                        <p className="stat-number">
-                            {counts.unlocked.toLocaleString()}<span className="unit"> / {counts.total.toLocaleString()}</span>
-                        </p>
-                    </div>
-                </div>
-                <div className="stat-bar">
-                    <div className="stat-bar-fill" style={{ width: percent + "%" }} />
-                </div>
-            </div>
-
             <form className="game-search" role="search" onSubmit={handleSearchSubmit}>
                 <input
                     type="search"
@@ -145,7 +111,43 @@ function Sidebar({ games, profile, goals, activeSession }) {
                 </Link>
             )}
 
-            <p className="label sidebar-footer">All data stored locally</p>
+            <div className="sidebar-bottom">
+                <div className="stat-card">
+                    <div className="stat-grid">
+                        <div>
+                            <p className="label">Games</p>
+                            <p className="stat-number">{games.length.toLocaleString()}</p>
+                        </div>
+                        <div>
+                            <p className="label">Achievements</p>
+                            <p className="stat-number">
+                                {counts.unlocked.toLocaleString()}<span className="unit"> / {counts.total.toLocaleString()}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div className="stat-bar">
+                        <div className="stat-bar-fill" style={{ width: percent + "%" }} />
+                    </div>
+                </div>
+
+                <div className="sidebar-profile">
+                    <span className="avatar" aria-hidden="true">
+                        {profile.avatarUrl
+                            ? <img src={profile.avatarUrl} alt="" />
+                            : (profile.name || "Player").charAt(0).toUpperCase()}
+                    </span>
+                    <div className="profile-text">
+                        <p className="profile-name">{profile.name || "Player"}</p>
+                        {shownGamertags.map((gamertag) => (
+                            <p key={gamertag.id} className="profile-tag">
+                                <span className="profile-platform">{getPlatformText(gamertag)}</span> {gamertag.tag}
+                            </p>
+                        ))}
+                    </div>
+                </div>
+
+                <p className="label sidebar-footer">All data stored locally</p>
+            </div>
         </aside>
     );
 }
