@@ -340,12 +340,13 @@ main {
 
 .goal-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
 }
 
 .goal-header h3 {
+    flex: 1;
     margin: 0;
 }
 
@@ -358,14 +359,19 @@ main {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 8px;
 }
 
 .goal-pills:empty {
     display: none;
 }
 
-.badge-muted {
+.badge.badge-game {
+    color: var(--accent-text);
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.badge.badge-muted {
     color: var(--text-muted);
     border-color: var(--border);
 }
@@ -656,6 +662,17 @@ main {
     color: var(--text);
     border-color: var(--accent);
     background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.game-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.game-controls select {
+    font-size: 0.85rem;
 }
 
 .achievement-list {

@@ -13,6 +13,10 @@ function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
         <article className={cardClass}>
             <div className="goal-header">
                 <h3>{goal.text}</h3>
+                <div className="goal-pills">
+                    {game && <span className="badge badge-game">{game.title}</span>}
+                    {goal.type === "achievement" && <span className="badge badge-muted">Achievement</span>}
+                </div>
                 <button
                     type="button"
                     className="icon-button"
@@ -21,11 +25,6 @@ function GoalCard({ goal, games, onToggle, onDelete, onProgressChange }) {
                 >
                     <X size={16} aria-hidden="true" />
                 </button>
-            </div>
-
-            <div className="goal-pills">
-                {game && <span className="badge">{game.title}</span>}
-                {goal.type === "achievement" && <span className="badge badge-muted">Achievement</span>}
             </div>
 
             <p className="goal-status">

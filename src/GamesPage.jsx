@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import AddGameForm from "./AddGameForm";
 import GameCard from "./GameCard";
+import { countAchievements } from "./stats";
+import { platformNames } from "./data";
 
 function isBacklog(game) {
     if (typeof game.playtimeMinutes === "number" && game.playtimeMinutes === 0) {
@@ -15,10 +17,37 @@ function isBacklog(game) {
     return !game.achievements.some((achievement) => achievement.earned);
 }
 
+function getPercent(game) {
+    const counts = countAchievements([game]);
+    return counts.total > 0 ? counts.unlocked / counts.total : 0;
+}
+
+function getLastActivity(game) {
+    const dates = game.achievements
+        .filter((achievement) => achievement.earnedDate)
+        .map((achievement) => achievement.earnedDate);
+    if (game.lastPlayed) {
+        dates.push(game.lastPlayed);
+    }
+
+    return dates.sort().at(-1) || "";
+}
+
+const sortOptions = [
+    { value: "az", label: "A-Z", compare: () => 0 },
+    { value: "recent", label: "Recently played", compare: (a, b) => getLastActivity(b).localeCompare(getLastActivity(a)) },
+    { value: "unlocked", label: "Most unlocked", compare: (a, b) => countAchievements([b]).unlocked - countAchievements([a]).unlocked },
+    { value: "percent", label: "Highest completion", compare: (a, b) => getPercent(b) - getPercent(a) },
+    { value: "hours", label: "Most hours played", compare: (a, b) => (b.playtimeMinutes || 0) - (a.playtimeMinutes || 0) }
+];
+
 function GamesPage({ games, onAddGame, onDeleteGame, onRestoreGame }) {
     const navigate = useNavigate();
     const [isAdding, setIsAdding] = useState(false);
     const [shownTab, setShownTab] = useState("playing");
+    const [sortBy, setSortBy] = useState("az");
+    const [platformFilter, setPlatformFilter] = useState("all");
+    const [statusFilter, setStatusFilter] = useState("all");
 
     const activeGames = games.filter((game) => !game.deleted);
     const deletedGames = games.filter((game) => game.deleted);
@@ -29,7 +58,24 @@ function GamesPage({ games, onAddGame, onDeleteGame, onRestoreGame }) {
         { value: "playing", label: "Playing", count: playedGames.length },
         { value: "backlog", label: "Backlog", count: backlogGames.length }
     ];
-    const shownGames = shownTab === "backlog" ? backlogGames : playedGames;
+    const tabGames = shownTab === "backlog" ? backlogGames : playedGames;
+    const sortOption = sortOptions.find((option) => option.value === sortBy);
+    const filteredGames = tabGames.filter((game) => {
+        if (platformFilter !== "all" && game.platform !== platformFilter) {
+            return false;
+        }
+
+        if (statusFilter === "complete" && getPercent(game) < 1) {
+            return false;
+        }
+
+        if (statusFilter === "incomplete" && getPercent(game) === 1) {
+            return false;
+        }
+
+        return true;
+    });
+    const shownGames = [...filteredGames].sort(sortOption.compare);
 
     function renderGameCard(game) {
         return (
@@ -76,6 +122,38 @@ function GamesPage({ games, onAddGame, onDeleteGame, onRestoreGame }) {
                                 {tab.label} ({tab.count})
                             </button>
                         ))}
+
+                        <div className="game-controls">
+                            <select
+                                aria-label="Sort games"
+                                value={sortBy}
+                                onChange={(event) => setSortBy(event.target.value)}
+                            >
+                                {sortOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>{option.label}</option>
+                                ))}
+                            </select>
+                            <select
+                                aria-label="Filter by platform"
+                                value={platformFilter}
+                                onChange={(event) => setPlatformFilter(event.target.value)}
+                            >
+                                <option value="all">All platforms</option>
+                                {Object.keys(platformNames).map((platform) => (
+                                    <option key={platform} value={platform}>{platformNames[platform]}</option>
+                                ))}
+                                <option value="other">Other</option>
+                            </select>
+                            <select
+                                aria-label="Filter by status"
+                                value={statusFilter}
+                                onChange={(event) => setStatusFilter(event.target.value)}
+                            >
+                                <option value="all">Any status</option>
+                                <option value="complete">100% complete</option>
+                                <option value="incomplete">Not complete</option>
+                            </select>
+                        </div>
                     </div>
                 )}
 

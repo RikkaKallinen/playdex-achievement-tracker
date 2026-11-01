@@ -1,5 +1,6 @@
 import { starterGames } from "./data";
 import { mergeSteamGames } from "./steamSync";
+import { repairGoalLinks } from "./goalStatus";
 import { useState, useEffect } from "react";
 import { get, set } from "idb-keyval";
 import { Routes, Route } from "react-router";
@@ -51,6 +52,14 @@ function App() {
     useEffect(() => {
         localStorage.setItem("playdex-goals", JSON.stringify(goals));
     }, [goals]);
+
+    useEffect(() => {
+        if (!gamesLoaded) {
+            return;
+        }
+
+        setGoals((currentGoals) => repairGoalLinks(currentGoals, games));
+    }, [games, gamesLoaded]);
 
     const [sessions, setSessions] = useState(() => {
         const savedSessions = localStorage.getItem("playdex-sessions");
