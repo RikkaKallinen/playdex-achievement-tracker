@@ -187,12 +187,6 @@ main {
 .platform-card,
 .summary-card,
 .session-panel,
-.session-live-header {
-    padding: 16px;
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: var(--radius);
-}
 
 .stat-tile-value {
     margin: 6px 0 0;
@@ -1763,8 +1757,10 @@ details summary {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    padding: 16px;
     margin-bottom: 16px;
-    border-color: var(--accent);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
     background: color-mix(in srgb, var(--accent) 10%, var(--surface));
     box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent);
 }
@@ -2451,6 +2447,23 @@ button,
     }
 }
 
+/* A quick glow-up, like something switching on. The last step falls back to the element's own glow */
+@keyframes switch-on {
+    0% {
+        opacity: 0.4;
+        transform: scale(0.97);
+        box-shadow: 0 0 0 0 transparent;
+    }
+
+    35% {
+        opacity: 1;
+        transform: scale(1.015);
+        box-shadow:
+            0 0 0 4px var(--accent),
+            0 0 40px color-mix(in srgb, var(--accent) 70%, transparent);
+    }
+}
+
 @keyframes fade-in {
     from { opacity: 0; }
 }
@@ -2489,6 +2502,16 @@ button,
             top 0.3s var(--ease-out),
             width 0.3s var(--ease-out),
             height 0.3s var(--ease-out);
+    }
+
+    /* Starting a session: the live header switches on, and so does the sidebar card when it turns live */
+    .session-live-header.just-started,
+    .session-card.live {
+        animation: switch-on 0.6s var(--ease-out);
+    }
+
+    .session-wrapup {
+        animation: page-in 0.5s var(--ease-gentle);
     }
 
     .stat-bar-fill {

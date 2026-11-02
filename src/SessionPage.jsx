@@ -28,6 +28,7 @@ function SessionPage({
     const [isAddingGoal, setIsAddingGoal] = useState(false);
     const [droppedGoalIds, setDroppedGoalIds] = useState([]);
     const [summaries, setSummaries] = useState({});
+    const [justStarted, setJustStarted] = useState(false);
 
     const activeGames = games.filter((game) => !game.deleted);
     const unfinishedGoals = goals.filter((goal) => !getGoalStatus(goal, games).completed);
@@ -55,6 +56,7 @@ function SessionPage({
     function handleStart() {
         const startingGoalIds = pickedGoalIds.filter((id) => unfinishedGoals.some((goal) => goal.id === id));
         onStartSession(startingGoalIds, pickedGameIds);
+        setJustStarted(true);
         setPickedGoalIds([]);
         setPickedGameIds([]);
     }
@@ -166,7 +168,7 @@ function SessionPage({
 
     if (isEnding) {
         return (
-            <section>
+            <section className="session-wrapup">
                 <h2>Wrap up the session</h2>
 
                 {progressSessionGoals.length > 0 && (
@@ -239,7 +241,7 @@ function SessionPage({
         <section>
             <h2>Tonight's session</h2>
 
-            <div className="session-live-header">
+            <div className={justStarted ? "session-live-header just-started" : "session-live-header"}>
                 <div>
                     <p className="label">Session in progress</p>
                     <p className="session-live-date">{formatDate(activeSession.startedDate)}</p>
