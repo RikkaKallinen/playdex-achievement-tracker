@@ -7,6 +7,8 @@ import { getGoalStatus } from "./goalStatus";
 import { formatDate } from "./formatDate";
 import { periods, getPeriodStart, getUnlocks, getLongestStreak, getActivityBuckets, formatPercent, cleanDescription } from "./summaryStats";
 import ProgressRing from "./ProgressRing";
+import CountUp from "./CountUp";
+import { useInView } from "./useInView";
 import ActivityChart from "./ActivityChart";
 import GenreChart from "./GenreChart";
 
@@ -16,6 +18,8 @@ function getPercent(counts) {
 
 function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
     const [period, setPeriod] = useState("all");
+    const [highlightsRef, highlightsInView] = useInView();
+    const [platformsRef, platformsInView] = useInView();
     const periodStart = getPeriodStart(period);
 
     const overall = countAchievements(games);
@@ -41,16 +45,16 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
     const tiles = [
         {
             label: "Achievements unlocked",
-            value: periodUnlocks.length.toLocaleString(),
+            value: periodUnlocks.length,
             detail: period === "all" ? "of " + overall.total.toLocaleString() + " · " + getPercent(overall) + "%" : null
         },
         {
             label: "Games played",
-            value: gamesPlayed.length.toLocaleString(),
+            value: gamesPlayed.length,
             detail: period === "all" ? "of " + games.length.toLocaleString() + " in your library" : null
         },
-        { label: "Goals completed", value: goalsCompleted.length.toLocaleString() },
-        { label: "Sessions", value: sessionsPlayed.length.toLocaleString() }
+        { label: "Goals completed", value: goalsCompleted.length },
+        { label: "Sessions", value: sessionsPlayed.length }
     ];
 
     const mostPlayed = games
@@ -99,7 +103,7 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
                 : "Every achievement unlocked"
         },
         { label: "Best streak", Icon: Flame, value: longestStreak, detail: longestStreak === 1 ? "day" : "days in a row" },
-        { label: "Hours played", Icon: Clock, value: totalHours.toLocaleString(), detail: "across Steam" },
+        { label: "Hours played", Icon: Clock, value: totalHours, detail: "across Steam" },
         {
             label: "Busiest day",
             Icon: CalendarDays,
@@ -112,7 +116,7 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
             value: firstUnlock ? firstUnlock.date.slice(0, 4) : "—",
             detail: firstUnlock ? firstUnlock.achievement.name + " · " + firstUnlock.game.title : "No unlocks yet"
         },
-        { label: "Avg completion", Icon: Percent, value: averageCompletion + "%", detail: "of games you've started" }
+        { label: "Avg completion", Icon: Percent, value: averageCompletion, suffix: "%", detail: "of games you've started" }
     ];
 
     const rarestUnlocks = allUnlocks
@@ -151,7 +155,7 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
                         {tiles.map((tile) => (
                             <div key={tile.label} className="stat-tile">
                                 <p className="label">{tile.label}</p>
-                                <p className="stat-tile-value">{tile.value}</p>
+                                <p className="stat-tile-value"><CountUp value={tile.value} /></p>
                                 {tile.detail && <p className="stat-detail">{tile.detail}</p>}
                             </div>
                         ))}
@@ -189,7 +193,7 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
                 </div>
             </section>
 
-            <section className="summary-section">
+            <section ref={highlightsRef} className={highlightsInView ? "summary-section" : "summary-section waiting"}>
                 <h2 className="summary-heading">All-time highlights</h2>
                 <p className="stat-detail summary-heading-note">Your whole history. Not affected by the period above.</p>
                 <div className="highlight-grid">
@@ -270,14 +274,16 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
                     </div>
 
                     <div className="mini-tiles">
-                        {miniTiles.map(({ label, Icon, value, detail }) => (
+                        {miniTiles.map(({ label, Icon, value, suffix, detail }) => (
                             <div key={label} className="mini-tile">
                                 <div className="mini-tile-head">
                                     <p className="label">{label}</p>
                                     <span className="mini-tile-icon" aria-hidden="true"><Icon size={14} /></span>
                                 </div>
                                 <div>
-                                    <p className="mini-tile-value">{value}</p>
+                                    <p className="mini-tile-value">
+                                        {typeof value === "number" ? <CountUp value={value} /> : value}{suffix}
+                                    </p>
                                     <p className="mini-tile-detail" title={detail}>{detail}</p>
                                 </div>
                             </div>
@@ -287,7 +293,7 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
             </section>
 
             {platformSections.length > 0 && (
-                <section className="summary-section">
+                <section ref={platformsRef} className={platformsInView ? "summary-section" : "summary-section waiting"}>
                     <h2 className="summary-heading">By platform</h2>
                     <div className="platform-cards">
                         {platformSections.map((section) => {
@@ -311,7 +317,7 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
                                     </div>
 
                                     <p className="platform-card-stat">
-                                        {counts.unlocked.toLocaleString()}
+                                        <CountUp value={counts.unlocked} />
                                         <span className="unit"> / {counts.total.toLocaleString()} achievements</span>
                                     </p>
 

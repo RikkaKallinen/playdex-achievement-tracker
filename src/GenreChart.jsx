@@ -49,26 +49,42 @@ function GenreChart({ games }) {
             <h3 className="label">Main genres</h3>
             <div className="genre-body">
                 <svg viewBox="0 0 160 160" className="genre-donut" role="img" aria-label="Main genre of each game">
-                    {placedSlices.map((slice) => {
-                        const visibleLength = Math.max(slice.length - gap, 0);
+                    <mask id="genre-reveal">
+                        <circle
+                            className="genre-reveal"
+                            cx="80"
+                            cy="80"
+                            r={radius}
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="24"
+                            strokeDasharray={circumference}
+                            strokeDashoffset="0"
+                            transform="rotate(-90 80 80)"
+                        />
+                    </mask>
+                    <g mask="url(#genre-reveal)">
+                        {placedSlices.map((slice) => {
+                            const visibleLength = Math.max(slice.length - gap, 0);
 
-                        return (
-                            <circle
-                                key={slice.name}
-                                cx="80"
-                                cy="80"
-                                r={radius}
-                                fill="none"
-                                stroke={slice.color}
-                                strokeWidth="22"
-                                strokeDasharray={visibleLength + " " + (circumference - visibleLength)}
-                                strokeDashoffset={-slice.start}
-                                transform="rotate(-90 80 80)"
-                            >
-                                <title>{slice.name}: {slice.count} games</title>
-                            </circle>
-                        );
-                    })}
+                            return (
+                                <circle
+                                    key={slice.name}
+                                    cx="80"
+                                    cy="80"
+                                    r={radius}
+                                    fill="none"
+                                    stroke={slice.color}
+                                    strokeWidth="22"
+                                    strokeDasharray={visibleLength + " " + (circumference - visibleLength)}
+                                    strokeDashoffset={-slice.start}
+                                    transform="rotate(-90 80 80)"
+                                >
+                                    <title>{slice.name}: {slice.count} games</title>
+                                </circle>
+                            );
+                        })}
+                    </g>
                     <text x="80" y="78" textAnchor="middle" className="genre-total">{gamesWithGenres.length}</text>
                     <text x="80" y="96" textAnchor="middle" className="genre-total-label">games</text>
                 </svg>

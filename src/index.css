@@ -2432,6 +2432,15 @@ button,
     from { --percent: 0; }
 }
 
+@keyframes bar-grow {
+    from { transform: scaleY(0); }
+}
+
+/* 377 is the donut's circumference (2 × π × 60), so the reveal starts fully hidden */
+@keyframes donut-sweep {
+    from { stroke-dashoffset: 377; }
+}
+
 /* Everything that actually moves only runs when the computer isn't set to reduce motion */
 @media (prefers-reduced-motion: no-preference) {
     main > section {
@@ -2446,6 +2455,20 @@ button,
     .stat-bar-fill {
         animation: bar-fill 1.2s var(--ease-gentle);
         transition: width 0.6s var(--ease-out);
+    }
+
+    /* Animations inside a section that hasn't scrolled into view yet wait at their start */
+    .waiting * {
+        animation-play-state: paused;
+    }
+
+    .activity-bar {
+        transform-origin: bottom;
+        animation: bar-grow 0.8s var(--ease-gentle);
+    }
+
+    .genre-reveal {
+        animation: donut-sweep 1.2s var(--ease-gentle);
     }
 
     .progress-ring {
@@ -2465,8 +2488,8 @@ button,
     .session-card:hover {
         transform: translateY(-8px);
         box-shadow:
-            0 0 14px color-mix(in srgb, var(--accent) 45%, transparent),
-            0 10px 16px -4px color-mix(in srgb, var(--accent) 45%, transparent);
+            0 0 12px color-mix(in srgb, var(--accent) 35%, transparent),
+            0 12px 16px -6px color-mix(in srgb, var(--accent) 80%, transparent);
     }
 
     /* The fade-in means a button that comes back after Cancel doesn't snap in */
