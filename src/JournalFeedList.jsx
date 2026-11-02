@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { NotebookPen, Target, Trophy, X, Zap } from "lucide-react";
 import { groupByDay } from "./journalFeed";
+import { cleanDescription } from "./summaryStats";
 import { AchievementStoryForm, SessionNoteForm } from "./JournalForms";
 
 const filters = [
@@ -182,7 +183,7 @@ function JournalItem({ item, games, currentGameId, onDeleteSession, onDeleteEntr
                         <li key={achievement.name}>
                             <Link
                                 to={"/games/" + item.game.id + "?achievement=" + encodeURIComponent(achievement.name)}
-                                title={achievement.description}
+                                title={cleanDescription(achievement.description)}
                             >
                                 {achievement.iconUrl
                                     ? <img src={achievement.iconUrl} alt="" />

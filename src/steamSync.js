@@ -77,12 +77,3 @@ function mergeAchievements(existingAchievements, steamAchievements, stats) {
 
     return [...synced, ...manualOnly];
 }
-
-export async function fetchSteamStats(steamId, appId) {
-    try {
-        const response = await fetch("/api/steam/stats?steamId=" + steamId + "&appId=" + appId);
-        return response.ok ? await response.json() : [];
-    } catch {
-        return [];
-    }
-}

@@ -1,13 +1,9 @@
-import { useState } from "react";
 import { trophyTiers } from "./data";
 import { formatDate } from "./formatDate";
-import { findTargetInDescription } from "./progressMatch";
+import { cleanDescription, formatRarity } from "./summaryStats";
 
-function AchievementCard({ achievement, highlighted, onToggle, onDelete, onUpdate, onLoadStats }) {
-    const [statOptions, setStatOptions] = useState(null);
-
+function AchievementCard({ achievement, highlighted, onToggle, onDelete, onUpdate }) {
     const isSynced = achievement.source === "steam";
-    const canTrackProgress = onLoadStats && achievement.source === "steam" && !achievement.earned;
     const showProgress = !achievement.earned && achievement.progressStat && achievement.progressTarget > 0;
     const progressPercent = showProgress
         ? Math.min(100, Math.round((achievement.progressValue / achievement.progressTarget) * 100))
@@ -24,28 +20,6 @@ function AchievementCard({ achievement, highlighted, onToggle, onDelete, onUpdat
     let icon = achievement.earned ? "🏆" : "🔒";
     if (achievement.iconUrl) {
         icon = <img src={achievement.iconUrl} alt="" />;
-    }
-
-    async function handleEditToggle(event) {
-        if (event.currentTarget.open && canTrackProgress && statOptions === null) {
-            setStatOptions(await onLoadStats());
-        }
-    }
-
-    function handleStatChange(event) {
-        const statName = event.target.value;
-        if (!statName) {
-            onUpdate({ progressStat: null, progressTarget: null, progressValue: null, progressPicked: true });
-            return;
-        }
-
-        const stat = statOptions.find((option) => option.name === statName);
-        onUpdate({
-            progressStat: statName,
-            progressTarget: achievement.progressTarget || findTargetInDescription(achievement.description),
-            progressValue: stat.value,
-            progressPicked: true
-        });
     }
 
     return (
@@ -70,7 +44,7 @@ function AchievementCard({ achievement, highlighted, onToggle, onDelete, onUpdat
                 </div>
 
                 {achievement.description && (
-                    <p className="achievement-description">{achievement.description}</p>
+                    <p className="achievement-description">{cleanDescription(achievement.description)}</p>
                 )}
 
                 <p className="achievement-date">
@@ -78,6 +52,9 @@ function AchievementCard({ achievement, highlighted, onToggle, onDelete, onUpdat
                         <>✓ Unlocked <time dateTime={achievement.earnedDate}>{formatDate(achievement.earnedDate)}</time></>
                     ) : (
                         "Not unlocked yet"
+                    )}
+                    {formatRarity(achievement.rarity) && (
+                        <span className="achievement-rarity"> · {formatRarity(achievement.rarity)}</span>
                     )}
                     {showProgress && (
                         <span className="achievement-progress">
@@ -105,59 +82,26 @@ function AchievementCard({ achievement, highlighted, onToggle, onDelete, onUpdat
                             <button className="button-quiet" onClick={onDelete}>Delete</button>
                         </>
                     )}
-                    <details className="achievement-edit" onToggle={handleEditToggle}>
-                        <summary>Edit</summary>
-                        <label htmlFor={"note-" + achievement.name}>Note</label>
-                        <textarea
-                            id={"note-" + achievement.name}
-                            rows="3"
-                            value={achievement.notes || ""}
-                            onChange={(event) => onUpdate({ notes: event.target.value })}
-                        />
-                        <label htmlFor={"icon-" + achievement.name}>Icon image link</label>
-                        <input
-                            type="url"
-                            id={"icon-" + achievement.name}
-                            placeholder="https://..."
-                            value={achievement.iconUrl || ""}
-                            onChange={(event) => onUpdate({ iconUrl: event.target.value })}
-                        />
-                        {canTrackProgress && (
-                            <>
-                                {statOptions === null && <p>Loading Steam counters...</p>}
-                                {statOptions && statOptions.length === 0 && <p>This game has no Steam counters.</p>}
-                                {statOptions && statOptions.length > 0 && (
-                                    <>
-                                        <label htmlFor={"stat-" + achievement.name}>Steam counter</label>
-                                        <select
-                                            id={"stat-" + achievement.name}
-                                            value={achievement.progressStat || ""}
-                                            onChange={handleStatChange}
-                                        >
-                                            <option value="">Not tracked</option>
-                                            {statOptions.map((stat) => (
-                                                <option key={stat.name} value={stat.name}>
-                                                    {stat.displayName} ({stat.value})
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {achievement.progressStat && (
-                                            <>
-                                                <label htmlFor={"target-" + achievement.name}>Target</label>
-                                                <input
-                                                    type="number"
-                                                    id={"target-" + achievement.name}
-                                                    min="1"
-                                                    value={achievement.progressTarget || ""}
-                                                    onChange={(event) => onUpdate({ progressTarget: Number(event.target.value), progressPicked: true })}
-                                                />
-                                            </>
-                                        )}
-                                    </>
-                                )}
-                            </>
-                        )}
-                    </details>
+                    {!isSynced && (
+                        <details className="achievement-edit">
+                            <summary>Edit</summary>
+                            <label htmlFor={"note-" + achievement.name}>Note</label>
+                            <textarea
+                                id={"note-" + achievement.name}
+                                rows="3"
+                                value={achievement.notes || ""}
+                                onChange={(event) => onUpdate({ notes: event.target.value })}
+                            />
+                            <label htmlFor={"icon-" + achievement.name}>Icon image link</label>
+                            <input
+                                type="url"
+                                id={"icon-" + achievement.name}
+                                placeholder="https://..."
+                                value={achievement.iconUrl || ""}
+                                onChange={(event) => onUpdate({ iconUrl: event.target.value })}
+                            />
+                        </details>
+                    )}
                 </div>
             </div>
         </article>

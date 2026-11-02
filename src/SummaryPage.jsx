@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { Award, CalendarDays, Clock, Flag, Flame, Percent } from "lucide-react";
 import { platformNames } from "./data";
 import { countAchievements, countGamerscore, countTrophies } from "./stats";
 import { getGoalStatus } from "./goalStatus";
 import { formatDate } from "./formatDate";
-import { periods, getPeriodStart, getUnlocks, getLongestStreak, getActivityBuckets } from "./summaryStats";
+import { periods, getPeriodStart, getUnlocks, getLongestStreak, getActivityBuckets, formatPercent, cleanDescription } from "./summaryStats";
 import ProgressRing from "./ProgressRing";
 import ActivityChart from "./ActivityChart";
 import GenreChart from "./GenreChart";
@@ -71,6 +72,54 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
 
     const longestStreak = getLongestStreak(allUnlocks);
 
+    const totalHours = Math.round(games.reduce((sum, game) => sum + (game.playtimeMinutes || 0), 0) / 60);
+
+    const unlocksPerDay = {};
+    for (const unlock of allUnlocks) {
+        unlocksPerDay[unlock.date] = (unlocksPerDay[unlock.date] || 0) + 1;
+    }
+    const busiestDay = Object.entries(unlocksPerDay).sort((a, b) => b[1] - a[1])[0];
+
+    const firstUnlock = allUnlocks[allUnlocks.length - 1];
+
+    const startedGames = games
+        .map((game) => countAchievements([game]))
+        .filter((counts) => counts.unlocked > 0);
+    const averageCompletion = startedGames.length > 0
+        ? Math.round(startedGames.reduce((sum, counts) => sum + counts.unlocked / counts.total, 0) / startedGames.length * 100)
+        : 0;
+
+    const miniTiles = [
+        {
+            label: "Perfect games",
+            Icon: Award,
+            value: perfectGames.length,
+            detail: perfectGames.length > 0
+                ? perfectGames.slice(0, 2).map((game) => game.title).join(", ") + (perfectGames.length > 2 ? "…" : "")
+                : "Every achievement unlocked"
+        },
+        { label: "Best streak", Icon: Flame, value: longestStreak, detail: longestStreak === 1 ? "day" : "days in a row" },
+        { label: "Hours played", Icon: Clock, value: totalHours.toLocaleString(), detail: "across Steam" },
+        {
+            label: "Busiest day",
+            Icon: CalendarDays,
+            value: busiestDay ? busiestDay[1] : 0,
+            detail: busiestDay ? "unlocks · " + formatDate(busiestDay[0]) : "No unlocks yet"
+        },
+        {
+            label: "First unlock",
+            Icon: Flag,
+            value: firstUnlock ? firstUnlock.date.slice(0, 4) : "—",
+            detail: firstUnlock ? firstUnlock.achievement.name + " · " + firstUnlock.game.title : "No unlocks yet"
+        },
+        { label: "Avg completion", Icon: Percent, value: averageCompletion + "%", detail: "of games you've started" }
+    ];
+
+    const rarestUnlocks = allUnlocks
+        .filter((unlock) => typeof unlock.achievement.rarity === "number")
+        .sort((a, b) => a.achievement.rarity - b.achievement.rarity)
+        .slice(0, 5);
+
     const platformSections = Object.keys(platformNames)
         .map((platform) => ({
             platform: platform,
@@ -120,7 +169,10 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
                             <ul className="recent-unlocks">
                                 {periodUnlocks.slice(0, 8).map(({ game, achievement, date }) => (
                                     <li key={game.id + achievement.name}>
-                                        <Link to={"/games/" + game.id} className="recent-unlock">
+                                        <Link
+                                            to={"/games/" + game.id + "?achievement=" + encodeURIComponent(achievement.name)}
+                                            className="recent-unlock"
+                                        >
                                             <span className="achievement-icon recent-unlock-icon" aria-hidden="true">
                                                 {achievement.iconUrl ? <img src={achievement.iconUrl} alt="" /> : "🏆"}
                                             </span>
@@ -184,21 +236,52 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
                         <GenreChart games={games} />
                     </div>
 
-                    <div className="highlight-tiles">
-                        <div className="stat-tile">
-                            <p className="label">Perfect games</p>
-                            <p className="stat-tile-value">{perfectGames.length}</p>
-                            <p className="stat-detail">
-                                {perfectGames.length > 0
-                                    ? perfectGames.slice(0, 3).map((game) => game.title).join(", ") + (perfectGames.length > 3 ? "…" : "")
-                                    : "Every achievement in a game unlocked"}
-                            </p>
-                        </div>
-                        <div className="stat-tile">
-                            <p className="label">Longest unlock streak</p>
-                            <p className="stat-tile-value">{longestStreak}</p>
-                            <p className="stat-detail">{longestStreak === 1 ? "day" : "days in a row"}</p>
-                        </div>
+                </div>
+
+                <div className="highlight-row">
+                    <div className="summary-card">
+                        <h3 className="label">Rarest unlocks</h3>
+                        {rarestUnlocks.length === 0 && <p className="stat-detail">Sync with Steam to see how rare your achievements are.</p>}
+                        <ol className="ranked-list">
+                            {rarestUnlocks.map(({ game, achievement }) => (
+                                <li key={game.id + achievement.name}>
+                                    <Link
+                                        to={"/games/" + game.id + "?achievement=" + encodeURIComponent(achievement.name)}
+                                        className="rare-row"
+                                    >
+                                        <span className="achievement-icon rare-icon" aria-hidden="true">
+                                            {achievement.iconUrl ? <img src={achievement.iconUrl} alt="" /> : "🏆"}
+                                        </span>
+                                        <span className="rare-text">
+                                            <span className="rare-name">{achievement.name}</span>
+                                            {achievement.description && (
+                                                <span className="rare-description">{cleanDescription(achievement.description)}</span>
+                                            )}
+                                            <span className="rare-game">{game.title}</span>
+                                        </span>
+                                        <span className="rare-percent">
+                                            {formatPercent(achievement.rarity)}
+                                            <span className="rare-percent-label">of players</span>
+                                        </span>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+
+                    <div className="mini-tiles">
+                        {miniTiles.map(({ label, Icon, value, detail }) => (
+                            <div key={label} className="mini-tile">
+                                <div className="mini-tile-head">
+                                    <p className="label">{label}</p>
+                                    <span className="mini-tile-icon" aria-hidden="true"><Icon size={14} /></span>
+                                </div>
+                                <div>
+                                    <p className="mini-tile-value">{value}</p>
+                                    <p className="mini-tile-detail" title={detail}>{detail}</p>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>

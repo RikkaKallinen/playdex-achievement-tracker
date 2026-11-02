@@ -8,12 +8,12 @@ import GameCover from "./GameCover";
 import PlatformStat from "./PlatformStat";
 import ProgressRing from "./ProgressRing";
 import { countAchievements } from "./stats";
-import { fetchSteamStats } from "./steamSync";
+import { genreOrder, getAutomaticMainGenre } from "./summaryStats";
 import { buildJournalFeed, filterFeedForGame } from "./journalFeed";
 import { NewEntryForm } from "./JournalForms";
 import JournalFeedList from "./JournalFeedList";
 
-function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievement, onUpdateGameCover, onUpdateGame, onAddJournalEntry, onDeleteJournalEntry, onDeleteSession, onAddSessionNote, onDeleteGoal, steamId }) {
+function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievement, onUpdateGameCover, onUpdateGame, onAddJournalEntry, onDeleteJournalEntry, onDeleteSession, onAddSessionNote, onDeleteGoal }) {
     const { gameId } = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
     const game = games.find((game) => game.id === gameId);
@@ -147,7 +147,7 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                             <button type="button" onClick={() => setIsAdding(true)}>+ Add achievement</button>
                         )}
                         <details>
-                            <summary>Cover &amp; banner</summary>
+                            <summary>Game settings</summary>
                             <label htmlFor="cover-url">Cover image link</label>
                             <input
                                 type="url"
@@ -165,6 +165,17 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                                 {heroUrl && <option value="hero">Steam artwork</option>}
                                 <option value="cover">Game cover</option>
                                 <option value="none">No banner</option>
+                            </select>
+                            <label htmlFor="main-genre">Main genre (for the Summary genre wheel)</label>
+                            <select
+                                id="main-genre"
+                                value={game.mainGenre || ""}
+                                onChange={(event) => onUpdateGame(game.id, { mainGenre: event.target.value || null })}
+                            >
+                                <option value="">Automatic{getAutomaticMainGenre(game) ? " (" + getAutomaticMainGenre(game) + ")" : ""}</option>
+                                {genreOrder.map((genre) => (
+                                    <option key={genre} value={genre}>{genre}</option>
+                                ))}
                             </select>
                         </details>
                     </div>
@@ -205,7 +216,6 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                                 onToggle={() => onToggleAchievement(game.id, achievement.name)}
                                 onDelete={() => onDeleteAchievement(game.id, achievement.name)}
                                 onUpdate={(changes) => onUpdateAchievement(game.id, achievement.name, changes)}
-                                onLoadStats={steamId && game.steamAppId ? () => fetchSteamStats(steamId, game.steamAppId) : null}
                             />
                         ))}
                     </div>

@@ -102,6 +102,25 @@ app.get("/api/steam/games", async (request, response) => {
     response.json(games);
 });
 
+async function getRarity(appId) {
+    try {
+        const rarityResponse = await fetch("https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=" + appId);
+        if (!rarityResponse.ok) {
+            return {};
+        }
+
+        const rarityData = await rarityResponse.json();
+        const rarity = {};
+        for (const achievement of rarityData.achievementpercentages?.achievements || []) {
+            rarity[achievement.name] = Number(achievement.percent);
+        }
+
+        return rarity;
+    } catch {
+        return {};
+    }
+}
+
 async function getStats(params, schemaData) {
     const schemaStats = schemaData.game?.availableGameStats?.stats || [];
     if (schemaStats.length === 0) {
@@ -142,6 +161,7 @@ app.get("/api/steam/achievements", async (request, response) => {
     const schemaData = await schemaResponse.json();
     const stats = await getStats(params, schemaData);
 
+    const rarity = await getRarity(request.query.appId);
     const playerAchievements = playerData.playerstats.achievements || [];
     const schemaAchievements = schemaData.game.availableGameStats?.achievements || [];
 
@@ -158,7 +178,8 @@ app.get("/api/steam/achievements", async (request, response) => {
             trophyTier: null,
             iconUrl: schemaAchievement.icon.replace("https://steamcdn-a.akamaihd.net/steamcommunity/public/images/", "https://shared.akamai.steamstatic.com/community_assets/images/"),
             earned: earned,
-            earnedDate: earned ? new Date(playerAchievement.unlocktime * 1000).toLocaleDateString("en-CA") : null
+            earnedDate: earned ? new Date(playerAchievement.unlocktime * 1000).toLocaleDateString("en-CA") : null,
+            rarity: rarity[schemaAchievement.name] ?? null
         };
 
         const progressStat = earned ? null : findProgressStat(achievement, stats);
@@ -172,23 +193,6 @@ app.get("/api/steam/achievements", async (request, response) => {
     });
 
     response.json({ achievements: achievements, stats: stats });
-});
-
-app.get("/api/steam/stats", async (request, response) => {
-    const params = new URLSearchParams({
-        key: process.env.STEAM_API_KEY,
-        steamid: request.query.steamId,
-        appid: request.query.appId
-    });
-
-    const schemaResponse = await fetch("https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?" + params);
-    if (!schemaResponse.ok) {
-        response.json([]);
-        return;
-    }
-
-    const schemaData = await schemaResponse.json();
-    response.json(await getStats(params, schemaData));
 });
 
 app.get("/api/steam/genres", async (request, response) => {

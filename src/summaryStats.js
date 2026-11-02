@@ -94,12 +94,33 @@ export function getActivityBuckets(unlocks, period) {
     });
 }
 
-const genreOrder = ["Racing", "Sports", "Strategy", "Simulation", "RPG", "Adventure", "Action", "Casual", "Massively Multiplayer"];
+export function formatPercent(rarity) {
+    if (typeof rarity !== "number") {
+        return null;
+    }
 
-export function getMainGenre(game) {
+    return (rarity < 10 ? rarity.toFixed(1) : Math.round(rarity)) + "%";
+}
+
+export function formatRarity(rarity) {
+    const percent = formatPercent(rarity);
+    return percent ? percent + " of players" : null;
+}
+
+export const genreOrder = ["Racing", "Sports", "Strategy", "Simulation", "RPG", "Adventure", "Action", "Casual", "Massively Multiplayer"];
+
+export function getAutomaticMainGenre(game) {
     if (!game.genres || game.genres.length === 0) {
         return null;
     }
 
     return genreOrder.find((genre) => game.genres.includes(genre)) || "Other";
+}
+
+export function getMainGenre(game) {
+    return game.mainGenre || getAutomaticMainGenre(game);
+}
+
+export function cleanDescription(description) {
+    return (description || "").replace(/\s*\(Creator:[^)]*\)\s*$/i, "");
 }

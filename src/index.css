@@ -486,11 +486,6 @@ main {
     margin-top: 0;
 }
 
-.highlight-tiles {
-    display: grid;
-    gap: 12px;
-}
-
 .ranked-list {
     display: flex;
     flex-direction: column;
@@ -828,8 +823,7 @@ main {
 
 /* Cards */
 .achievement-card,
-.goal-card,
-.timeline-item {
+.goal-card {
     background: var(--surface);
     border: 2px solid var(--border);
     border-radius: var(--radius);
@@ -1385,59 +1379,6 @@ textarea {
 details summary {
     cursor: pointer;
     color: var(--text-muted);
-}
-
-/* Timeline filter dropdown */
-.filter-dropdown {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 10px;
-}
-
-.filter-dropdown summary {
-    list-style: none;
-    color: var(--text);
-    background: var(--surface-raised);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 4px 12px;
-}
-
-.filter-dropdown summary::-webkit-details-marker {
-    display: none;
-}
-
-.filter-dropdown ul {
-    position: absolute;
-    z-index: 1;
-    min-width: 220px;
-    margin: 4px 0 0;
-    padding: 4px 0;
-    list-style: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-}
-
-.filter-dropdown li button {
-    display: block;
-    width: 100%;
-    padding: 4px 12px;
-    text-align: left;
-    font-weight: normal;
-    color: var(--text);
-    background: none;
-    border-radius: 0;
-}
-
-.filter-dropdown li button:hover {
-    background: var(--surface-raised);
-    filter: none;
-}
-
-.check {
-    display: inline-block;
-    width: 1.5em;
 }
 
 /* Accent color picker */
@@ -2254,5 +2195,168 @@ details summary {
 @media (max-width: 560px) {
     .journal-thumb {
         width: 80px;
+    }
+}
+
+.achievement-rarity {
+    font-weight: normal;
+    color: var(--text-muted);
+}
+
+.rare-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    text-decoration: none;
+    color: var(--text);
+    border-radius: 8px;
+}
+
+.rare-row:hover {
+    background: var(--surface-raised);
+}
+
+.rare-icon {
+    width: 48px;
+    height: 48px;
+}
+
+.rare-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rare-name {
+    font-weight: 700;
+}
+
+.rare-description {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.rare-game {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.rare-percent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+}
+
+.rare-percent-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.game-header-actions details label,
+.game-header-actions details input,
+.game-header-actions details select {
+    display: block;
+    margin-top: 8px;
+}
+
+.game-header-actions details input {
+    width: min(360px, 100%);
+    box-sizing: border-box;
+}
+
+.highlight-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.highlight-row .summary-card {
+    margin-top: 0;
+}
+
+.mini-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 12px;
+}
+
+.mini-tile {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    min-width: 0;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.mini-tile-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.mini-tile-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border-radius: 7px;
+}
+
+.mini-tile-head .label {
+    padding-top: 5px;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+}
+
+.mini-tile-value {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+}
+
+.mini-tile-detail {
+    display: -webkit-box;
+    min-height: calc(2 * 1.35em);
+    margin: 6px 0 0;
+    overflow: hidden;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+@media (max-width: 1100px) {
+    .highlight-row {
+        grid-template-columns: 1fr;
+    }
+
+    .mini-tiles {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }

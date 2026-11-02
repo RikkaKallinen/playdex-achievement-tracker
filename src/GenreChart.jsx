@@ -6,7 +6,7 @@ const circumference = 2 * Math.PI * radius;
 const gap = 2;
 
 function GenreChart({ games }) {
-    const gamesWithGenres = games.filter((game) => game.genres && game.genres.length > 0);
+    const gamesWithGenres = games.filter((game) => getMainGenre(game));
 
     if (gamesWithGenres.length === 0) {
         return (

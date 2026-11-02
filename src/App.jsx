@@ -492,7 +492,6 @@ function App() {
                                 onDeleteSession={deleteSession}
                                 onAddSessionNote={addSessionNote}
                                 onDeleteGoal={deleteGoal}
-                                steamId={profile.steamId}
                             />
                         }
                     />
