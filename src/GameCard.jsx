@@ -15,8 +15,14 @@ function GameCard({ game, onSelect, onDelete }) {
                 <h3>{game.title}</h3>
                 <p className="badge">{getPlatformText(game)}</p>
                 <div className="game-progress">
-                    <ProgressRing percent={percent} />
-                    <span>{counts.unlocked} / {counts.total} achievements</span>
+                    {counts.total > 0 ? (
+                        <>
+                            <ProgressRing percent={percent} />
+                            <span>{counts.unlocked} / {counts.total} achievements</span>
+                        </>
+                    ) : (
+                        <span>No achievements</span>
+                    )}
                 </div>
                 <PlatformStat game={game} />
                 <button

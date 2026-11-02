@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router";
-import { ChartColumn, Gamepad2, Settings, Target, Zap } from "lucide-react";
+import { BookOpen, ChartColumn, Gamepad2, Settings, Target, Zap } from "lucide-react";
 import { getPlatformText } from "./data";
 import { countAchievements } from "./stats";
 import { getGoalStatus } from "./goalStatus";
@@ -9,6 +9,7 @@ const navLinks = [
     { to: "/", label: "Games", Icon: Gamepad2 },
     { to: "/goals", label: "Goals", Icon: Target },
     { to: "/session", label: "Session", Icon: Zap },
+    { to: "/journal", label: "Journal", Icon: BookOpen },
     { to: "/summary", label: "Summary", Icon: ChartColumn },
     { to: "/settings", label: "Settings", Icon: Settings }
 ];

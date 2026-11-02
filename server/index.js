@@ -25,6 +25,41 @@ async function findCoverUrl(appId) {
     }
 }
 
+async function findHeroUrls(appIds) {
+    const heroUrls = {};
+
+    for (let index = 0; index < appIds.length; index += 50) {
+        const chunk = appIds.slice(index, index + 50);
+        const input = {
+            ids: chunk.map((appId) => ({ appid: appId })),
+            context: { language: "english", country_code: "US" },
+            data_request: { include_assets: true }
+        };
+
+        try {
+            const storeResponse = await fetch(
+                "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/?input_json=" + encodeURIComponent(JSON.stringify(input))
+            );
+            if (!storeResponse.ok) {
+                continue;
+            }
+
+            const storeData = await storeResponse.json();
+            for (const item of storeData.response?.store_items || []) {
+                const assets = item.assets;
+                if (assets?.library_hero && assets.asset_url_format) {
+                    heroUrls[item.appid] = "https://shared.akamai.steamstatic.com/store_item_assets/"
+                        + assets.asset_url_format.replace("${FILENAME}", assets.library_hero);
+                }
+            }
+        } catch {
+            continue;
+        }
+    }
+
+    return heroUrls;
+}
+
 app.get("/api/steam/games", async (request, response) => {
     const params = new URLSearchParams({
         key: process.env.STEAM_API_KEY,
@@ -51,6 +86,8 @@ app.get("/api/steam/games", async (request, response) => {
 
     const steamGames = [...ownedGames, ...familyGames];
 
+    const heroUrls = await findHeroUrls(steamGames.map((steamGame) => steamGame.appid));
+
     const games = await Promise.all(steamGames.map(async (steamGame) => ({
         steamAppId: steamGame.appid,
         title: steamGame.name.trim(),
@@ -58,7 +95,8 @@ app.get("/api/steam/games", async (request, response) => {
         lastPlayed: steamGame.rtime_last_played > 0
             ? new Date(steamGame.rtime_last_played * 1000).toLocaleDateString("en-CA")
             : null,
-        coverUrl: await findCoverUrl(steamGame.appid)
+        coverUrl: await findCoverUrl(steamGame.appid),
+        heroUrl: heroUrls[steamGame.appid] || null
     })));
 
     response.json(games);

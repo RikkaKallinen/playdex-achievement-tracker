@@ -3,7 +3,7 @@ import { trophyTiers } from "./data";
 import { formatDate } from "./formatDate";
 import { findTargetInDescription } from "./progressMatch";
 
-function AchievementCard({ achievement, onToggle, onDelete, onUpdate, onLoadStats }) {
+function AchievementCard({ achievement, highlighted, onToggle, onDelete, onUpdate, onLoadStats }) {
     const [statOptions, setStatOptions] = useState(null);
 
     const isSynced = achievement.source === "steam";
@@ -13,9 +13,9 @@ function AchievementCard({ achievement, onToggle, onDelete, onUpdate, onLoadStat
         ? Math.min(100, Math.round((achievement.progressValue / achievement.progressTarget) * 100))
         : 0;
 
-    const cardClass = achievement.earned
-        ? "achievement-card unlocked"
-        : "achievement-card";
+    const cardClass = "achievement-card"
+        + (achievement.earned ? " unlocked" : "")
+        + (highlighted ? " highlighted" : "");
 
     const iconClass = achievement.trophyTier
         ? "achievement-icon tier-" + achievement.trophyTier
@@ -49,7 +49,7 @@ function AchievementCard({ achievement, onToggle, onDelete, onUpdate, onLoadStat
     }
 
     return (
-        <article className={cardClass}>
+        <article className={cardClass} id={"achievement-" + achievement.name}>
             <div className={iconClass} aria-hidden="true">
                 {icon}
             </div>

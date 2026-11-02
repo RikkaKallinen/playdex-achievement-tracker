@@ -33,3 +33,32 @@ export function repairGoalLinks(goals, games) {
 
     return changed ? repairedGoals : goals;
 }
+
+export function groupGoalsByGame(goals, games) {
+    const groups = [];
+
+    for (const goal of goals) {
+        const key = goal.gameId || "none";
+        let group = groups.find((existingGroup) => existingGroup.key === key);
+
+        if (!group) {
+            const game = games.find((game) => game.id === goal.gameId);
+            group = { key: key, title: game ? game.title : "No game", goals: [] };
+            groups.push(group);
+        }
+
+        group.goals.push(goal);
+    }
+
+    return groups.sort((a, b) => {
+        if (a.key === "none") {
+            return 1;
+        }
+
+        if (b.key === "none") {
+            return -1;
+        }
+
+        return a.title.localeCompare(b.title);
+    });
+}

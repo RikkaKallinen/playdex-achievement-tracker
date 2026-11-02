@@ -8,9 +8,11 @@ import GoalsPage from "./GoalsPage";
 import GamesPage from "./GamesPage";
 import GamePage from "./GamePage";
 import SessionPage from "./SessionPage";
+import JournalPage from "./JournalPage";
 import SummaryPage from "./SummaryPage";
 import SettingsPage from "./SettingsPage";
 import Sidebar from "./Sidebar";
+import ScrollToTop from "./ScrollToTop";
 
 function App() {
     const [games, setGames] = useState([]);
@@ -66,7 +68,7 @@ function App() {
         return savedSessions ? JSON.parse(savedSessions) : [];
     });
     const activeSession = sessions.find((session) => !session.ended);
-    const endedSessions = sessions.filter((session) => session.ended);
+    const endedSessions = sessions.filter((session) => session.ended && !session.loggedLater);
     const lastKeptGoalIds = endedSessions.length > 0 ? endedSessions[endedSessions.length - 1].keptGoalIds || [] : [];
 
     useEffect(() => {
@@ -146,7 +148,8 @@ function App() {
                 title: game.title,
                 playtimeMinutes: game.playtimeMinutes,
                 lastPlayed: game.lastPlayed,
-                coverUrl: game.coverUrl
+                coverUrl: game.coverUrl,
+                heroUrl: game.heroUrl
             });
         }
 
@@ -260,6 +263,16 @@ function App() {
         }));
     }
 
+    function updateGame(gameId, changes) {
+        setGames((currentGames) => currentGames.map((game) => {
+            if (game.id !== gameId) {
+                return game;
+            }
+
+            return { ...game, ...changes };
+        }));
+    }
+
     function deleteAchievement(gameId, achievementName) {
         setGames(games.map((game) => {
             if (game.id !== gameId) {
@@ -346,29 +359,79 @@ function App() {
         }));
     }
 
-    function startSession(goalIds) {
+    function startSession(goalIds, gameIds) {
         setSessions([...sessions, {
             id: crypto.randomUUID(),
             startedDate: new Date().toLocaleDateString("en-CA"),
+            startedAt: Date.now(),
             goalIds: goalIds,
+            gameIds: gameIds,
             ended: false,
             endedDate: null
         }]);
     }
 
-    function endSession(keptGoalIds, summaries) {
-        setSessions(sessions.map((session) => {
-            if (session.id !== activeSession.id) {
+    function updateActiveSession(changeSession) {
+        setSessions((currentSessions) => currentSessions.map((session) => {
+            if (session.ended) {
                 return session;
             }
 
+            return changeSession(session);
+        }));
+    }
+
+    function addGoalToSession(goalId) {
+        updateActiveSession((session) => ({ ...session, goalIds: [...session.goalIds, goalId] }));
+    }
+
+    function addGameToSession(gameId) {
+        updateActiveSession((session) => ({ ...session, gameIds: [...(session.gameIds || []), gameId] }));
+    }
+
+    function removeGameFromSession(gameId) {
+        updateActiveSession((session) => ({
+            ...session,
+            gameIds: (session.gameIds || []).filter((id) => id !== gameId)
+        }));
+    }
+
+    function addNewSessionGoal(newGoal) {
+        setGoals((currentGoals) => [...currentGoals, newGoal]);
+        addGoalToSession(newGoal.id);
+    }
+
+    function logPastSession(newSession) {
+        setSessions((currentSessions) => [...currentSessions, newSession]);
+    }
+
+    function addSessionNote(sessionId, note) {
+        setSessions((currentSessions) => currentSessions.map((session) => {
+            if (session.id !== sessionId) {
+                return session;
+            }
+
+            const gameIds = session.gameIds || [];
             return {
                 ...session,
-                ended: true,
-                endedDate: new Date().toLocaleDateString("en-CA"),
-                keptGoalIds: keptGoalIds,
-                summaries: summaries
+                gameIds: gameIds.includes(note.gameId) ? gameIds : [...gameIds, note.gameId],
+                summaries: [...(session.summaries || []), note]
             };
+        }));
+    }
+
+    function deleteSession(sessionId) {
+        setSessions((currentSessions) => currentSessions.filter((session) => session.id !== sessionId));
+    }
+
+    function endSession(keptGoalIds, summaries) {
+        updateActiveSession((session) => ({
+            ...session,
+            ended: true,
+            endedDate: new Date().toLocaleDateString("en-CA"),
+            endedAt: Date.now(),
+            keptGoalIds: keptGoalIds,
+            summaries: summaries
         }));
     }
 
@@ -397,6 +460,7 @@ function App() {
             <Sidebar games={activeGames} profile={profile} goals={goals} activeSession={activeSession} />
 
             <main>
+                <ScrollToTop />
                 <Routes>
                     <Route
                         path="/"
@@ -419,11 +483,15 @@ function App() {
                                 onDeleteAchievement={deleteAchievement}
                                 onUpdateAchievement={updateAchievement}
                                 onUpdateGameCover={updateGameCover}
+                                onUpdateGame={updateGame}
                                 goals={goals}
                                 sessions={sessions}
                                 journalEntries={journalEntries}
                                 onAddJournalEntry={addJournalEntry}
                                 onDeleteJournalEntry={deleteJournalEntry}
+                                onDeleteSession={deleteSession}
+                                onAddSessionNote={addSessionNote}
+                                onDeleteGoal={deleteGoal}
                                 steamId={profile.steamId}
                             />
                         }
@@ -451,9 +519,31 @@ function App() {
                                 lastKeptGoalIds={lastKeptGoalIds}
                                 onStartSession={startSession}
                                 onEndSession={endSession}
+                                onAddGoalToSession={addGoalToSession}
+                                onAddGameToSession={addGameToSession}
+                                onRemoveGameFromSession={removeGameFromSession}
+                                onAddNewGoal={addNewSessionGoal}
                                 onToggleGoal={toggleGoal}
                                 onDeleteGoal={deleteGoal}
                                 onUpdateGoalProgress={updateGoalProgress}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/journal"
+                        element={
+                            <JournalPage
+                                games={sortedGames}
+                                goals={goals}
+                                sessions={sessions}
+                                journalEntries={journalEntries}
+                                onDeleteSession={deleteSession}
+                                onAddEntry={addJournalEntry}
+                                onLogPastSession={logPastSession}
+                                onAddSessionNote={addSessionNote}
+                                onUpdateAchievement={updateAchievement}
+                                onDeleteEntry={deleteJournalEntry}
+                                onDeleteGoal={deleteGoal}
                             />
                         }
                     />

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import AddGoalForm from "./AddGoalForm";
 import GoalCard from "./GoalCard";
-import { getGoalStatus } from "./goalStatus";
+import { getGoalStatus, groupGoalsByGame } from "./goalStatus";
 
 function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpdateGoalProgress }) {
     const [isAdding, setIsAdding] = useState(false);
@@ -29,37 +29,8 @@ function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpda
         );
     }
 
-    function groupByGame(goalList) {
-        const groups = [];
-
-        for (const goal of goalList) {
-            const key = goal.gameId || "none";
-            let group = groups.find((existingGroup) => existingGroup.key === key);
-
-            if (!group) {
-                const game = games.find((game) => game.id === goal.gameId);
-                group = { key: key, title: game ? game.title : "No game", goals: [] };
-                groups.push(group);
-            }
-
-            group.goals.push(goal);
-        }
-
-        return groups.sort((a, b) => {
-            if (a.key === "none") {
-                return 1;
-            }
-
-            if (b.key === "none") {
-                return -1;
-            }
-
-            return a.title.localeCompare(b.title);
-        });
-    }
-
     function renderGroups(goalList) {
-        return groupByGame(goalList).map((group) => (
+        return groupGoalsByGame(goalList, games).map((group) => (
             <div key={group.key} className="goal-group">
                 <h4 className="goal-group-title">
                     {group.title}

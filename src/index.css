@@ -185,7 +185,9 @@ main {
 
 .stat-tile,
 .platform-card,
-.summary-card {
+.summary-card,
+.session-panel,
+.session-live-header {
     padding: 16px;
     background: var(--surface);
     border: 2px solid var(--border);
@@ -950,13 +952,16 @@ main {
 .game-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    grid-auto-rows: 1fr;
-    gap: 16px;
+    column-gap: 16px;
 }
 
+/* Each tile shares the grid's rows, so titles, pills, progress and buttons line up across a row */
 .game-card {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 6;
+    row-gap: 8px;
+    margin-bottom: 16px;
     overflow: hidden;
     cursor: pointer;
     background: var(--surface);
@@ -1003,19 +1008,39 @@ main {
 }
 
 .game-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 12px 14px 14px;
+    display: contents;
 }
 
-.game-info .button-quiet {
-    margin-top: auto;
+.game-info > * {
+    margin-left: 14px;
+    margin-right: 14px;
 }
 
 .game-info h3 {
-    margin: 0;
+    grid-row: 2;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+.game-info > .badge {
+    grid-row: 3;
+    margin: 0 14px;
+}
+
+.game-info > .game-progress {
+    grid-row: 4;
+}
+
+.game-info > .title-gamerscore,
+.game-info > .trophy-counts {
+    grid-row: 5;
+}
+
+.game-info > .button-quiet {
+    grid-row: 6;
+    align-self: end;
+    justify-self: start;
+    margin-bottom: 14px;
 }
 
 .game-progress {
@@ -1501,6 +1526,64 @@ details summary {
     border-radius: var(--radius);
 }
 
+/* Game page banner: Steam's wide hero art shown at its own shape (3840x1240), fading into the card */
+.game-header.with-banner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    column-gap: 20px;
+    padding: 0 20px 20px;
+    overflow: hidden;
+}
+
+.game-banner {
+    position: relative;
+    grid-column: 1 / -1;
+    aspect-ratio: 3840 / 1240;
+    margin: 0 -20px;
+}
+
+.game-banner img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.game-banner.from-cover {
+    overflow: hidden;
+}
+
+.game-banner.from-cover .banner-backdrop {
+    position: absolute;
+    inset: 0;
+    filter: blur(32px) brightness(0.7);
+    transform: scale(1.3);
+}
+
+.game-banner.from-cover .banner-cover {
+    position: relative;
+    width: auto;
+    height: 100%;
+    margin: 0 auto;
+    object-fit: contain;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+.game-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 55%, var(--surface) 100%);
+}
+
+.game-header.with-banner .game-header-info,
+.game-header.with-banner .progress-ring {
+    position: relative;
+    margin-top: -48px;
+}
+
 .game-header-cover {
     flex-shrink: 0;
     width: 180px;
@@ -1636,4 +1719,540 @@ details summary {
 .loading-message {
     padding: 32px;
     color: var(--text-muted);
+}
+
+/* Session page */
+.session-panel {
+    margin-bottom: 16px;
+}
+
+.session-panel > .label {
+    margin-bottom: 4px;
+}
+
+.session-panel-note {
+    margin: 0 0 12px;
+}
+
+.game-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.game-picker input {
+    max-width: 360px;
+}
+
+.game-picker-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.game-picker-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.game-picker-remove {
+    display: grid;
+    place-items: center;
+    padding: 2px;
+    color: inherit;
+    background: transparent;
+    border-radius: 50%;
+}
+
+.game-picker-remove:hover {
+    background: color-mix(in srgb, var(--accent-text) 15%, transparent);
+}
+
+.goal-pick-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px;
+}
+
+.goal-pick {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    background: var(--surface-raised);
+    border: 2px solid transparent;
+    border-radius: 10px;
+}
+
+.goal-pick span:first-of-type {
+    flex: 1;
+}
+
+.goal-pick .stat-detail {
+    margin: 0;
+}
+
+.goal-pick.picked {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, var(--surface-raised));
+}
+
+.session-live-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.session-live-header .label {
+    color: var(--accent);
+}
+
+.session-live-date {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+
+.session-timer {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+}
+
+.session-live-progress {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.session-live-progress .stat-detail {
+    margin: 0;
+}
+
+.session-goals-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.session-goals-header .label {
+    margin-right: auto;
+}
+
+.wrap-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.wrap-row:last-child {
+    border-bottom: none;
+}
+
+.summary-box {
+    margin-bottom: 12px;
+}
+
+.summary-box label {
+    font-weight: 600;
+}
+
+/* Journal page */
+.journal-day {
+    margin-top: 28px;
+}
+
+.journal-day-title {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.journal-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.journal-item.session {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+.journal-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border-radius: 8px;
+}
+
+.journal-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.journal-kind {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.journal-game {
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.journal-game:hover {
+    text-decoration: underline;
+}
+
+.journal-games {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+    margin-top: 4px;
+}
+
+.journal-delete {
+    align-self: flex-start;
+}
+
+.journal-text {
+    margin: 6px 0 0;
+    white-space: pre-wrap;
+}
+
+.journal-quote {
+    margin: 10px 0 0;
+    padding: 8px 12px;
+    white-space: pre-wrap;
+    background: var(--surface-raised);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+}
+
+.journal-quote-game {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.journal-unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.journal-unlocks a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px 3px 3px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: var(--text);
+    background: var(--surface-raised);
+    border: 1px solid transparent;
+    border-radius: 999px;
+}
+
+.journal-unlocks a:hover {
+    border-color: var(--accent);
+}
+
+.journal-more {
+    height: 100%;
+    padding: 3px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: transparent;
+    border: 1px dashed color-mix(in srgb, var(--accent) 50%, transparent);
+    border-radius: 999px;
+}
+
+.journal-more:hover {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    filter: none;
+}
+
+.journal-unlocks img {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+}
+
+.session-start {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 760px;
+    padding: 24px;
+    background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+    border: 2px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+    border-radius: calc(var(--radius) + 4px);
+}
+
+.session-start-intro {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.session-start-intro .stat-detail {
+    margin: 2px 0 0;
+}
+
+.session-start-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+}
+
+.session-start-title {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.session-start-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 12px;
+    align-items: start;
+}
+
+.session-start-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 0;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.session-start-row .game-picker {
+    margin-top: 0;
+}
+
+.goal-pick-group + .goal-pick-group {
+    margin-top: 14px;
+}
+
+.goal-pick-game {
+    margin: 0 0 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.session-start-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    font-size: 1.05rem;
+}
+
+@media (max-width: 560px) {
+    .session-start-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .session-start-label {
+        margin-top: 0;
+    }
+}
+
+/* Game page tabs */
+.section-tabs {
+    display: flex;
+    gap: 4px;
+    margin-top: 20px;
+    border-bottom: 2px solid var(--border);
+}
+
+.section-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: -2px;
+    padding: 10px 16px;
+    font-size: 1rem;
+    color: var(--text-muted);
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+}
+
+.section-tab:hover {
+    color: var(--text);
+    filter: none;
+}
+
+.section-tab.selected {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+}
+
+.section-tab-count {
+    padding: 0 8px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--surface-raised);
+    border-radius: 999px;
+}
+
+/* An achievement opened from the Journal */
+.achievement-card.highlighted {
+    animation: highlight-glow 1.2s ease-in-out 3;
+}
+
+@keyframes highlight-glow {
+    0%, 100% { box-shadow: 0 0 0 0 transparent; }
+    50% { box-shadow: 0 0 0 4px var(--accent), 0 0 28px color-mix(in srgb, var(--accent) 60%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .achievement-card.highlighted {
+        animation: none;
+        box-shadow: 0 0 0 3px var(--accent);
+    }
+}
+
+.form-label {
+    margin: 8px 0;
+    font-weight: 600;
+}
+
+.duration-inputs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.duration-inputs label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+
+.duration-inputs input {
+    width: 80px;
+    margin: 0;
+}
+
+.journal-add-note {
+    margin-top: 10px;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+}
+
+.journal-note-panel {
+    margin: 12px 0 0;
+}
+
+.journal-pinned {
+    margin-bottom: 8px;
+}
+
+.journal-pinned-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding-left: 18px;
+}
+
+.journal-day-note {
+    position: relative;
+    padding-right: 36px;
+}
+
+.journal-note-delete {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+}
+
+.journal-thumb {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 110px;
+    aspect-ratio: 460 / 215;
+    align-self: flex-start;
+    overflow: hidden;
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--surface-raised);
+    border-radius: 10px;
+}
+
+.journal-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.journal-kind {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.journal-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border-radius: 999px;
+}
+
+@media (max-width: 560px) {
+    .journal-thumb {
+        width: 80px;
+    }
 }
