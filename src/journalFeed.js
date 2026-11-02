@@ -18,7 +18,7 @@ export function buildJournalFeed({ games, goals, sessions, journalEntries }) {
             sourceId: session.id,
             date: session.endedDate || session.startedDate,
             minutes: session.startedAt && session.endedAt
-                ? Math.round((session.endedAt - session.startedAt) / 60000)
+                ? Math.round((session.endedAt - session.startedAt - (session.pausedMs || 0)) / 60000)
                 : session.minutes || null,
             loggedLater: Boolean(session.loggedLater),
             games: gameIds.map(findGame).filter((game) => game),

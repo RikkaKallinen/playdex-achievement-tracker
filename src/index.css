@@ -1782,6 +1782,27 @@ details summary {
     color: var(--text);
 }
 
+.session-timer-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.session-timer.paused {
+    color: var(--text-muted);
+}
+
+.session-pause-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.live-dot.paused {
+    background: var(--text-muted);
+    animation: none;
+}
+
 .session-live-progress {
     display: flex;
     align-items: baseline;
@@ -2464,6 +2485,10 @@ button,
     }
 }
 
+@keyframes paused-blink {
+    50% { opacity: 0.4; }
+}
+
 @keyframes fade-in {
     from { opacity: 0; }
 }
@@ -2508,6 +2533,11 @@ button,
     .session-live-header.just-started,
     .session-card.live {
         animation: switch-on 0.6s var(--ease-out);
+    }
+
+    /* A paused timer gently blinks, like a paused video */
+    .session-timer.paused {
+        animation: paused-blink 2s ease-in-out infinite;
     }
 
     .session-wrapup {

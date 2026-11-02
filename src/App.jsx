@@ -381,6 +381,24 @@ function App() {
         }));
     }
 
+    function pauseSession() {
+        updateActiveSession((session) => (session.pausedAt ? session : { ...session, pausedAt: Date.now() }));
+    }
+
+    function resumeSession() {
+        updateActiveSession((session) => {
+            if (!session.pausedAt) {
+                return session;
+            }
+
+            return {
+                ...session,
+                pausedMs: (session.pausedMs || 0) + (Date.now() - session.pausedAt),
+                pausedAt: null
+            };
+        });
+    }
+
     function addGoalToSession(goalId) {
         updateActiveSession((session) => ({ ...session, goalIds: [...session.goalIds, goalId] }));
     }
@@ -427,6 +445,8 @@ function App() {
     function endSession(keptGoalIds, summaries) {
         updateActiveSession((session) => ({
             ...session,
+            pausedMs: (session.pausedMs || 0) + (session.pausedAt ? Date.now() - session.pausedAt : 0),
+            pausedAt: null,
             ended: true,
             endedDate: new Date().toLocaleDateString("en-CA"),
             endedAt: Date.now(),
@@ -518,6 +538,8 @@ function App() {
                                 lastKeptGoalIds={lastKeptGoalIds}
                                 onStartSession={startSession}
                                 onEndSession={endSession}
+                                onPauseSession={pauseSession}
+                                onResumeSession={resumeSession}
                                 onAddGoalToSession={addGoalToSession}
                                 onAddGameToSession={addGameToSession}
                                 onRemoveGameFromSession={removeGameFromSession}

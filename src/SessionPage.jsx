@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Gamepad2, Play, Target, Zap } from "lucide-react";
+import { Gamepad2, Pause, Play, Target, Zap } from "lucide-react";
 import GoalCard from "./GoalCard";
 import AddGoalForm from "./AddGoalForm";
 import GamePicker from "./GamePicker";
@@ -14,6 +14,8 @@ function SessionPage({
     lastKeptGoalIds,
     onStartSession,
     onEndSession,
+    onPauseSession,
+    onResumeSession,
     onAddGoalToSession,
     onAddGameToSession,
     onRemoveGameFromSession,
@@ -243,10 +245,29 @@ function SessionPage({
 
             <div className={justStarted ? "session-live-header just-started" : "session-live-header"}>
                 <div>
-                    <p className="label">Session in progress</p>
+                    <p className="label">{activeSession.pausedAt ? "Paused" : "Session in progress"}</p>
                     <p className="session-live-date">{formatDate(activeSession.startedDate)}</p>
                 </div>
-                {activeSession.startedAt && <SessionTimer startedAt={activeSession.startedAt} />}
+                {activeSession.startedAt && (
+                    <div className="session-timer-block">
+                        <SessionTimer
+                            startedAt={activeSession.startedAt}
+                            pausedMs={activeSession.pausedMs}
+                            pausedAt={activeSession.pausedAt}
+                        />
+                        {activeSession.pausedAt ? (
+                            <button type="button" className="session-pause-button" onClick={onResumeSession}>
+                                <Play size={16} aria-hidden="true" />
+                                Resume
+                            </button>
+                        ) : (
+                            <button type="button" className="button-quiet session-pause-button" onClick={onPauseSession}>
+                                <Pause size={16} aria-hidden="true" />
+                                Pause
+                            </button>
+                        )}
+                    </div>
+                )}
                 <div className="session-live-progress">
                     <span className="stat-tile-value">{sessionGoalsDone}</span>
                     <span className="stat-detail">of {sessionGoals.length} goals done</span>

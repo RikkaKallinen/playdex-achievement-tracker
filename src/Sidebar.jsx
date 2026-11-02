@@ -92,7 +92,10 @@ function Sidebar({ games, profile, goals, activeSession }) {
                             <span className="nav-badge" aria-label={inProgressCount + " in progress"}>{inProgressCount}</span>
                         )}
                         {to === "/session" && activeSession && (
-                            <span className="live-dot" aria-label="Session in progress" />
+                            <span
+                                className={activeSession.pausedAt ? "live-dot paused" : "live-dot"}
+                                aria-label={activeSession.pausedAt ? "Session paused" : "Session in progress"}
+                            />
                         )}
                     </NavLink>
                 ))}
@@ -101,7 +104,7 @@ function Sidebar({ games, profile, goals, activeSession }) {
 
             {activeSession ? (
                 <Link to="/session" className="session-card live">
-                    <span className="label">Session in progress</span>
+                    <span className="label">{activeSession.pausedAt ? "Session paused" : "Session in progress"}</span>
                     <span className="session-card-text">
                         {sessionGoals.length > 0
                             ? sessionGoalsDone + " of " + sessionGoals.length + " goals done"
