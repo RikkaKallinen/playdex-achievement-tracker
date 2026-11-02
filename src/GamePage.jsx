@@ -31,7 +31,8 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
 
         const card = document.getElementById("achievement-" + highlightName);
         if (card) {
-            card.scrollIntoView({ behavior: "smooth", block: "center" });
+            const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            card.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
         }
     }, [gameId, highlightName]);
 

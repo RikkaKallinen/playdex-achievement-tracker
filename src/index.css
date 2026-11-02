@@ -2374,3 +2374,113 @@ details summary {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }
+
+/* Motion */
+/* Registering --percent as a number lets the browser animate it, so progress rings can fill up */
+@property --percent {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 0;
+}
+
+:root {
+    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --ease-gentle: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Colour changes fade instead of snapping. Fading isn't movement, so this stays on for everyone */
+button,
+.chip,
+.section-tab,
+.sidebar nav a,
+.session-card,
+.game-card,
+.achievement-card,
+.goal-card,
+.game-picker-add {
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.4s ease,
+        filter 0.25s ease;
+}
+
+@keyframes page-in {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+}
+
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+}
+
+@keyframes bar-fill {
+    from { width: 0; }
+}
+
+@keyframes ring-fill {
+    from { --percent: 0; }
+}
+
+/* Everything that actually moves only runs when the computer isn't set to reduce motion */
+@media (prefers-reduced-motion: no-preference) {
+    main > section {
+        animation: page-in 0.5s var(--ease-gentle);
+    }
+
+    .add-panel,
+    .journal-note-panel {
+        animation: panel-in 0.35s var(--ease-gentle);
+    }
+
+    .stat-bar-fill {
+        animation: bar-fill 1.2s var(--ease-gentle);
+        transition: width 0.6s var(--ease-out);
+    }
+
+    .progress-ring {
+        animation: ring-fill 1.2s var(--ease-gentle);
+        transition: --percent 0.6s var(--ease-out);
+    }
+
+    .game-card,
+    .session-card {
+        transition:
+            transform 0.25s var(--ease-out),
+            border-color 0.25s ease,
+            box-shadow 0.4s ease;
+    }
+
+    .game-card:hover,
+    .session-card:hover {
+        transform: translateY(-8px);
+        box-shadow:
+            0 0 14px color-mix(in srgb, var(--accent) 45%, transparent),
+            0 10px 16px -4px color-mix(in srgb, var(--accent) 45%, transparent);
+    }
+
+    /* The fade-in means a button that comes back after Cancel doesn't snap in */
+    button {
+        animation: fade-in 0.3s ease;
+        transition:
+            transform 0.12s ease,
+            background-color 0.25s ease,
+            color 0.25s ease,
+            border-color 0.25s ease,
+            filter 0.25s ease;
+    }
+
+    button:active:not(:disabled) {
+        transform: scale(0.93);
+    }
+}
