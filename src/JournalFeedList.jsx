@@ -4,6 +4,7 @@ import { NotebookPen, Target, Trophy, X, Zap } from "lucide-react";
 import { groupByDay } from "./journalFeed";
 import { cleanDescription } from "./summaryStats";
 import { AchievementStoryForm, SessionNoteForm } from "./JournalForms";
+import SlidingHighlight from "./SlidingHighlight";
 
 const filters = [
     { value: "all", label: "All" },
@@ -277,6 +278,7 @@ function JournalFeedList({ feed, games, currentGameId = null, emptyMessage, ...h
                         {filter.label} ({filter.value === "all" ? feed.length : feed.filter((item) => item.type === filter.value).length})
                     </button>
                 ))}
+                <SlidingHighlight className="chip-highlight" />
             </div>
 
             {days.length === 0 && <p>{emptyMessage}</p>}

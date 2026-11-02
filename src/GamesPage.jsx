@@ -4,6 +4,7 @@ import AddGameForm from "./AddGameForm";
 import GameCard from "./GameCard";
 import { countAchievements } from "./stats";
 import { platformNames } from "./data";
+import SlidingHighlight from "./SlidingHighlight";
 
 function isBacklog(game) {
     if (typeof game.playtimeMinutes === "number" && game.playtimeMinutes === 0) {
@@ -122,6 +123,7 @@ function GamesPage({ games, onAddGame, onDeleteGame, onRestoreGame }) {
                                 {tab.label} ({tab.count})
                             </button>
                         ))}
+                        <SlidingHighlight className="chip-highlight" />
 
                         <div className="game-controls">
                             <select

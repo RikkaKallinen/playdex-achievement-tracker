@@ -599,6 +599,7 @@ main {
 }
 
 .sidebar nav {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -622,10 +623,9 @@ main {
     background: var(--surface-raised);
 }
 
+/* The active look itself comes from .nav-highlight, which slides between links */
 .sidebar nav a.active {
     color: var(--text);
-    background: color-mix(in srgb, var(--accent) 15%, transparent);
-    border-left-color: var(--accent);
 }
 
 .game-search input {
@@ -812,8 +812,10 @@ main {
         border-radius: 6px 6px 0 0;
     }
 
-    .sidebar nav a.active {
-        border-bottom-color: var(--accent);
+    .nav-highlight {
+        border-left: none;
+        border-bottom: 3px solid var(--accent);
+        border-radius: 6px 6px 0 0;
     }
 
     main {
@@ -1197,6 +1199,7 @@ main {
 }
 
 .filter-chips {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -1213,10 +1216,9 @@ main {
     border-radius: 999px;
 }
 
+/* The selected look itself comes from .chip-highlight, which slides between chips */
 .chip.selected {
     color: var(--text);
-    border-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 .game-controls {
@@ -2055,6 +2057,7 @@ details summary {
 
 /* Game page tabs */
 .section-tabs {
+    position: relative;
     display: flex;
     gap: 4px;
     margin-top: 20px;
@@ -2081,7 +2084,6 @@ details summary {
 
 .section-tab.selected {
     color: var(--text);
-    border-bottom-color: var(--accent);
 }
 
 .section-tab-count {
@@ -2406,6 +2408,35 @@ button,
         filter 0.25s ease;
 }
 
+/* SlidingHighlight sets --left, --top, --width and --height to match the selected chip or tab */
+.sliding-highlight {
+    position: absolute;
+    left: var(--left);
+    top: var(--top);
+    width: var(--width);
+    height: var(--height);
+    pointer-events: none;
+}
+
+.chip-highlight {
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.nav-highlight {
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.tab-highlight {
+    top: auto;
+    bottom: -2px;
+    height: 2px;
+    background: var(--accent);
+}
+
 @keyframes page-in {
     from {
         opacity: 0;
@@ -2450,6 +2481,14 @@ button,
     .add-panel,
     .journal-note-panel {
         animation: panel-in 0.35s var(--ease-gentle);
+    }
+
+    .sliding-highlight {
+        transition:
+            left 0.3s var(--ease-out),
+            top 0.3s var(--ease-out),
+            width 0.3s var(--ease-out),
+            height 0.3s var(--ease-out);
     }
 
     .stat-bar-fill {

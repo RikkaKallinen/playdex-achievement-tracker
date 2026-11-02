@@ -12,6 +12,7 @@ import { genreOrder, getAutomaticMainGenre } from "./summaryStats";
 import { buildJournalFeed, filterFeedForGame } from "./journalFeed";
 import { NewEntryForm } from "./JournalForms";
 import JournalFeedList from "./JournalFeedList";
+import SlidingHighlight from "./SlidingHighlight";
 
 function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievement, onUpdateGameCover, onUpdateGame, onAddJournalEntry, onDeleteJournalEntry, onDeleteSession, onAddSessionNote, onDeleteGoal }) {
     const { gameId } = useParams();
@@ -138,6 +139,7 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                     >
                         Journal <span className="section-tab-count">{journalFeed.length}</span>
                     </button>
+                    <SlidingHighlight className="tab-highlight" />
                 </div>
             </section>
 
@@ -205,6 +207,7 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                                     {filter.label} ({filter.count})
                                 </button>
                             ))}
+                            <SlidingHighlight className="chip-highlight" />
                         </div>
                     )}
 

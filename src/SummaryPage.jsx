@@ -11,6 +11,7 @@ import CountUp from "./CountUp";
 import { useInView } from "./useInView";
 import ActivityChart from "./ActivityChart";
 import GenreChart from "./GenreChart";
+import SlidingHighlight from "./SlidingHighlight";
 
 function getPercent(counts) {
     return counts.total > 0 ? Math.round((counts.unlocked / counts.total) * 100) : 0;
@@ -149,6 +150,7 @@ function SummaryPage({ games, goals, sessions, hiddenPlatforms }) {
                                 {option.label}
                             </button>
                         ))}
+                        <SlidingHighlight className="chip-highlight" />
                     </div>
 
                     <div className="stat-tiles">

@@ -2,6 +2,7 @@ import { useState } from "react";
 import AddGoalForm from "./AddGoalForm";
 import GoalCard from "./GoalCard";
 import { getGoalStatus, groupGoalsByGame } from "./goalStatus";
+import SlidingHighlight from "./SlidingHighlight";
 
 function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpdateGoalProgress }) {
     const [isAdding, setIsAdding] = useState(false);
@@ -75,6 +76,7 @@ function GoalsPage({ goals, games, onAddGoal, onToggleGoal, onDeleteGoal, onUpda
                             {tab.label} ({tab.count})
                         </button>
                     ))}
+                    <SlidingHighlight className="chip-highlight" />
                 </div>
             )}
 

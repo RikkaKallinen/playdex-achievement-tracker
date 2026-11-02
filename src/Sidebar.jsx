@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { BookOpen, ChartColumn, Gamepad2, Settings, Target, Zap } from "lucide-react";
 import { getPlatformText } from "./data";
 import { countAchievements } from "./stats";
 import { getGoalStatus } from "./goalStatus";
+import SlidingHighlight from "./SlidingHighlight";
 
 const navLinks = [
     { to: "/", label: "Games", Icon: Gamepad2 },
@@ -16,6 +17,8 @@ const navLinks = [
 
 function Sidebar({ games, profile, goals, activeSession }) {
     const navigate = useNavigate();
+    // Re-render on every page change so the nav highlight can follow the active link
+    useLocation();
     const [search, setSearch] = useState("");
 
     function openGame(game) {
@@ -93,6 +96,7 @@ function Sidebar({ games, profile, goals, activeSession }) {
                         )}
                     </NavLink>
                 ))}
+                <SlidingHighlight className="nav-highlight" selector=".active" />
             </nav>
 
             {activeSession ? (
