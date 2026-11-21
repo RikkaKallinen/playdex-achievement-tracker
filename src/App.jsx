@@ -124,7 +124,8 @@ function App() {
         if (storage === "browser") {
             localStorage.setItem("playdex-accent", accentColor);
         }
-        document.documentElement.dataset.accent = accentColor;
+        // The welcome page (nobody signed in) always uses Playdex's own look: purple and the default font
+        document.documentElement.dataset.accent = storage === "browser" ? "purple" : accentColor;
     }, [accentColor, storage]);
 
     const [fontChoice, setFontChoice] = useState(() => {
@@ -135,7 +136,7 @@ function App() {
         if (storage === "browser") {
             localStorage.setItem("playdex-font", fontChoice);
         }
-        document.documentElement.dataset.font = fontChoice;
+        document.documentElement.dataset.font = storage === "browser" ? "default" : fontChoice;
     }, [fontChoice, storage]);
 
     const [profile, setProfile] = useState(() => {

@@ -22,7 +22,8 @@ export const accentColors = {
     teal: "Teal",
     green: "Green",
     orange: "Orange",
-    pink: "Pink"
+    pink: "Pink",
+    red: "Red"
 };
 
 export const fontOptions = {

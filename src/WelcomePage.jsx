@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Gamepad2 } from "lucide-react";
+import { BookOpen, ChartColumn, Gamepad2, RefreshCw, Target, Trophy, Zap } from "lucide-react";
 import AchievementCard from "./AchievementCard";
 import GoalCard from "./GoalCard";
 import SessionTimer from "./SessionTimer";
@@ -192,6 +192,21 @@ const clips = [
     { label: "Journal", caption: "Keep a journal of the moments worth remembering.", Clip: JournalClip }
 ];
 
+const steps = [
+    { title: "Sign in with Steam", text: "One click. Steam handles the login." },
+    { title: "Sync your library", text: "Games, achievements and hours played come straight in." },
+    { title: "Play with purpose", text: "Set goals, time your sessions and write down the moments that matter." }
+];
+
+const features = [
+    { Icon: RefreshCw, title: "Steam sync", text: "Your whole library, kept up to date." },
+    { Icon: Trophy, title: "Achievement progress", text: "See how close you are, and how rare each unlock is." },
+    { Icon: Target, title: "Goals", text: "Count-up or tick-off goals, tagged and grouped by game." },
+    { Icon: Zap, title: "Play sessions", text: "A timer for tonight's games, with notes when you wrap up." },
+    { Icon: BookOpen, title: "Journal", text: "Every session, unlock and story in one timeline." },
+    { Icon: ChartColumn, title: "Summary", text: "Streaks, rare unlocks, top games and your favourite genres." }
+];
+
 function WelcomePage({ signInFailed }) {
     const [shownClip, setShownClip] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
@@ -225,22 +240,24 @@ function WelcomePage({ signInFailed }) {
                         <p>Track it. Log it. Beat it.</p>
                     </div>
                 </div>
-                <button type="button" onClick={signIn}>Sign in through Steam</button>
+                <button type="button" className="button-quiet" onClick={signIn}>Sign in</button>
             </header>
 
             <section className="welcome-hero">
                 <div className="welcome-copy">
-                    <h2>Every game, achievement and play session in one place</h2>
-                    <p>
-                        Playdex brings in your Steam library, achievements and hours played, then helps you set goals,
-                        time your sessions and keep a journal of the moments worth remembering.
+                    <h2>
+                        A home for<br />
+                        <span className="welcome-accent">everything you play</span>
+                    </h2>
+                    <p className="welcome-lead">
+                        Bring in your Steam library and achievements, then set goals, time your play sessions
+                        and keep a journal of your best moments.
                     </p>
                     {signInFailed && <p className="field-hint">Steam sign-in didn't work. Try again.</p>}
-                    <button type="button" className="welcome-signin" onClick={signIn}>Sign in through Steam</button>
-                    <p className="stat-detail">
-                        Steam handles the login, so Playdex never sees your password.
-                        Xbox, PlayStation and other games can be added by hand once you're in.
-                    </p>
+                    <div className="welcome-actions">
+                        <button type="button" className="welcome-signin" onClick={signIn}>Sign in through Steam</button>
+                        <a href="#how-it-works" className="welcome-more">See how it works ↓</a>
+                    </div>
                 </div>
 
                 <div
@@ -275,6 +292,42 @@ function WelcomePage({ signInFailed }) {
                     <p className="welcome-caption">{caption}</p>
                 </div>
             </section>
+
+            <section className="welcome-section" id="how-it-works">
+                <h3 className="label">How it works</h3>
+                <ol className="welcome-steps">
+                    {steps.map((step, index) => (
+                        <li key={step.title}>
+                            <span className="welcome-step-number">{index + 1}</span>
+                            <h4>{step.title}</h4>
+                            <p>{step.text}</p>
+                        </li>
+                    ))}
+                </ol>
+            </section>
+
+            <section className="welcome-section">
+                <h3 className="label">What's inside</h3>
+                <div className="welcome-features">
+                    {features.map(({ Icon, title, text }) => (
+                        <div key={title} className="welcome-feature">
+                            <Icon size={22} aria-hidden="true" />
+                            <h4>{title}</h4>
+                            <p>{text}</p>
+                        </div>
+                    ))}
+                </div>
+                <div className="welcome-actions welcome-bottom-cta">
+                    <button type="button" className="welcome-signin" onClick={signIn}>Sign in through Steam</button>
+                </div>
+            </section>
+
+            <footer className="welcome-footer">
+                <p>Steam handles the sign-in, so Playdex never sees your password.</p>
+                <p>Achievements and hours played need your Steam profile's Game details set to Public.</p>
+                <p>Xbox, PlayStation and other games can be added by hand once you're signed in.</p>
+                <p>Playdex isn't affiliated with Valve. Steam is a trademark of Valve Corporation.</p>
+            </footer>
         </div>
     );
 }

@@ -18,6 +18,7 @@
 [data-accent="green"] { --accent: #4ade80; }
 [data-accent="orange"] { --accent: #fb923c; }
 [data-accent="pink"] { --accent: #f472b6; }
+[data-accent="red"] { --accent: #ef4444; }
 
 [data-font="default"] {
     --font-heading: "Space Grotesk", system-ui, sans-serif;
@@ -1914,14 +1915,119 @@ details summary {
     line-height: 1.1;
 }
 
-.welcome-copy p {
-    max-width: 46ch;
+.welcome-accent {
+    color: var(--accent);
+}
+
+.welcome-lead {
+    max-width: 42ch;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+.welcome-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    margin-top: 24px;
 }
 
 .welcome-signin {
-    margin: 12px 0;
     padding: 12px 24px;
     font-size: 1.1rem;
+}
+
+.welcome-more {
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.welcome-more:hover {
+    text-decoration: underline;
+}
+
+/* Summary clip: a tidy 2 × 2 instead of 3 + 1 */
+.welcome-stage .stat-tiles {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* Lower sections: how it works, features, then the small print */
+.welcome-section {
+    margin-top: 96px;
+    scroll-margin-top: 24px;
+}
+
+.welcome-section > .label {
+    margin-bottom: 20px;
+}
+
+.welcome-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.welcome-step-number {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--accent-text);
+    background: var(--accent);
+    border-radius: 50%;
+}
+
+.welcome-steps h4,
+.welcome-feature h4 {
+    margin: 12px 0 4px;
+    font-size: 1.05rem;
+}
+
+.welcome-steps p,
+.welcome-feature p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.welcome-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.welcome-feature {
+    padding: 20px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.welcome-feature svg {
+    color: var(--accent);
+}
+
+.welcome-bottom-cta {
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.welcome-footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.welcome-footer p {
+    margin: 0 0 4px;
 }
 
 .welcome-demo {
@@ -2001,8 +2107,17 @@ details summary {
 }
 
 @media (max-width: 900px) {
-    .welcome-hero {
+    .welcome-hero,
+    .welcome-steps {
         grid-template-columns: 1fr;
+    }
+
+    .welcome-features {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .welcome-section {
+        margin-top: 64px;
     }
 
     .welcome {
@@ -2011,6 +2126,19 @@ details summary {
 
     .welcome-header {
         margin-bottom: 32px;
+    }
+}
+
+@media (max-width: 560px) {
+    .welcome-features {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* "See how it works ↓" glides down instead of jumping, unless motion is reduced */
+@media (prefers-reduced-motion: no-preference) {
+    html:has(.welcome) {
+        scroll-behavior: smooth;
     }
 }
 
