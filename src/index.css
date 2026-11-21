@@ -186,7 +186,12 @@ main {
 .stat-tile,
 .platform-card,
 .summary-card,
-.session-panel,
+.session-panel {
+    padding: 16px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+}
 
 .stat-tile-value {
     margin: 6px 0 0;
