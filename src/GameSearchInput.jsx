@@ -1,11 +1,15 @@
 import { useState } from "react";
+import GameCombobox from "./GameCombobox";
 
-function GameSearchInput({ id, games, onPick, required = false }) {
-    const [search, setSearch] = useState("");
+// initialGameId fills the box when editing something that already has a game
+function GameSearchInput({ id, games, onPick, required = false, initialGameId = "" }) {
+    const [search, setSearch] = useState(() => {
+        const initialGame = games.find((game) => game.id === initialGameId);
+        return initialGame ? initialGame.title : "";
+    });
     const typedGame = games.find((game) => game.title === search);
 
-    function handleChange(event) {
-        const typed = event.target.value;
+    function handleTextChange(typed) {
         const match = games.find((game) => game.title === typed);
         setSearch(typed);
         onPick(match ? match.id : "");
@@ -13,22 +17,20 @@ function GameSearchInput({ id, games, onPick, required = false }) {
 
     return (
         <>
-            <input
-                type="text"
+            <GameCombobox
                 id={id}
-                list={id + "-options"}
+                games={games}
                 placeholder="Start typing a game..."
-                value={search}
-                onChange={handleChange}
                 required={required}
+                value={search}
+                onTextChange={handleTextChange}
+                onPick={(game) => {
+                    setSearch(game.title);
+                    onPick(game.id);
+                }}
             />
-            <datalist id={id + "-options"}>
-                {games.map((game) => (
-                    <option key={game.id} value={game.title} />
-                ))}
-            </datalist>
             {search && !typedGame && (
-                <p className="field-hint">No game called "{search}" yet. Pick one from the list.</p>
+                <p className="field-hint">Pick a game from the list to link it.</p>
             )}
         </>
     );

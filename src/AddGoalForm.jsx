@@ -1,20 +1,70 @@
-import { useState } from "react";
+import { useId, useState } from "react";
+import GameSearchInput from "./GameSearchInput";
+import TagInput from "./TagInput";
+import SlidingHighlight from "./SlidingHighlight";
+import GoalCard from "./GoalCard";
+import { getTagsForGame } from "./goalTags";
 
-function AddGoalForm({ games, onAddGoal, onCancel }) {
-    const [type, setType] = useState("open");
-    const [text, setText] = useState("");
-    const [gameId, setGameId] = useState("");
-    const [gameSearch, setGameSearch] = useState("");
-    const [achievementName, setAchievementName] = useState("");
-    const [target, setTarget] = useState("");
+function today() {
+    return new Date().toLocaleDateString("en-CA");
+}
+
+// Adds a new goal, or edits one when `goal` is passed in (the form starts filled in and the type can't change)
+function AddGoalForm({ games, goals, goal = null, onAddGoal, onSaveGoal, onCancel }) {
+    const idPrefix = useId();
+    const isEditing = goal !== null;
+    const [type, setType] = useState(isEditing ? goal.type : "open");
+    const [text, setText] = useState(isEditing && goal.type === "open" ? goal.text : "");
+    const [gameId, setGameId] = useState(isEditing ? goal.gameId || "" : "");
+    const [achievementName, setAchievementName] = useState(isEditing ? goal.achievementName || "" : "");
+    const [target, setTarget] = useState(isEditing && goal.target ? String(goal.target) : "");
+    const [tags, setTags] = useState(isEditing ? goal.tags || [] : []);
 
     const selectedGame = games.find((game) => game.id === gameId);
-    const lockedAchievements = selectedGame
-        ? selectedGame.achievements.filter((achievement) => !achievement.earned)
+    // When editing, the goal's own achievement stays in the list even if it's already unlocked
+    const pickableAchievements = selectedGame
+        ? selectedGame.achievements.filter((achievement) =>
+            !achievement.earned || (isEditing && achievement.name === goal.achievementName)
+        )
         : [];
+
+    // The card on the right, built from whatever has been typed so far
+    const previewGoal = {
+        id: "preview",
+        type: type,
+        text: type === "achievement"
+            ? achievementName || "Pick an achievement"
+            : text.trim() || "Your goal",
+        gameId: gameId,
+        achievementName: achievementName,
+        target: type === "open" && Number(target) > 0 ? Number(target) : null,
+        progress: isEditing ? goal.progress || 0 : 0,
+        completed: isEditing ? goal.completed : false,
+        completedDate: isEditing ? goal.completedDate : null,
+        tags: tags
+    };
 
     function handleSubmit(event) {
         event.preventDefault();
+        const newTarget = target === "" ? null : Number(target);
+
+        if (isEditing) {
+            const changes = type === "achievement"
+                ? { text: achievementName, gameId: gameId, achievementName: achievementName, tags: tags }
+                : { text: text, gameId: gameId, target: newTarget, tags: tags };
+
+            // A new target can finish (or un-finish) a goal: 30 of 50 done is complete once the target drops to 30
+            if (type === "open" && newTarget !== null) {
+                const progress = Math.min(goal.progress || 0, newTarget);
+                const completed = progress >= newTarget;
+                changes.progress = progress;
+                changes.completed = completed;
+                changes.completedDate = completed ? goal.completedDate || today() : null;
+            }
+
+            onSaveGoal(changes);
+            return;
+        }
 
         if (type === "achievement") {
             onAddGoal({
@@ -26,7 +76,8 @@ function AddGoalForm({ games, onAddGoal, onCancel }) {
                 target: null,
                 progress: 0,
                 completed: false,
-                completedDate: null
+                completedDate: null,
+                tags: tags
             });
         } else {
             onAddGoal({
@@ -34,109 +85,122 @@ function AddGoalForm({ games, onAddGoal, onCancel }) {
                 type: "open",
                 text: text,
                 gameId: gameId,
-                target: target === "" ? null : Number(target),
+                target: newTarget,
                 progress: 0,
                 completed: false,
-                completedDate: null
+                completedDate: null,
+                tags: tags
             });
         }
-
-        setText("");
-        setGameId("");
-        setGameSearch("");
-        setAchievementName("");
-        setTarget("");
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label htmlFor="goal-type">Goal type</label>
-            <select
-                id="goal-type"
-                value={type}
-                onChange={(event) => setType(event.target.value)}
-            >
-                <option value="open">Open goal</option>
-                <option value="achievement">Achievement goal</option>
-            </select>
+        <div className="goal-form-layout">
+            <form onSubmit={handleSubmit} className="goal-form">
+                {!isEditing && (
+                    <div className="filter-chips goal-type-toggle" role="group" aria-label="Goal type">
+                        <button
+                            type="button"
+                            className={type === "open" ? "chip selected" : "chip"}
+                            aria-pressed={type === "open"}
+                            onClick={() => setType("open")}
+                        >
+                            Open goal
+                        </button>
+                        <button
+                            type="button"
+                            className={type === "achievement" ? "chip selected" : "chip"}
+                            aria-pressed={type === "achievement"}
+                            onClick={() => setType("achievement")}
+                        >
+                            Achievement
+                        </button>
+                        <SlidingHighlight className="chip-highlight" />
+                    </div>
+                )}
 
-            {type === "open" && (
-                <>
-                    <label htmlFor="goal-text">Goal</label>
-                    <input
-                        type="text"
-                        id="goal-text"
-                        value={text}
-                        onChange={(event) => setText(event.target.value)}
-                        required
+                {type === "open" && (
+                    <div className="form-field wide">
+                        <label htmlFor={idPrefix + "text"} className="label">Goal</label>
+                        <input
+                            type="text"
+                            id={idPrefix + "text"}
+                            placeholder="e.g. Win 50 matches"
+                            value={text}
+                            onChange={(event) => setText(event.target.value)}
+                            required
+                        />
+                    </div>
+                )}
+
+                <div className="form-field">
+                    <label htmlFor={idPrefix + "game"} className="label">
+                        Game {type === "open" && <span className="optional">optional</span>}
+                    </label>
+                    <GameSearchInput
+                        id={idPrefix + "game"}
+                        games={games}
+                        initialGameId={gameId}
+                        required={type === "achievement"}
+                        onPick={(pickedGameId) => {
+                            setGameId(pickedGameId);
+                            setAchievementName("");
+                        }}
                     />
-                </>
-            )}
+                </div>
 
-            <label htmlFor="goal-game">
-                {type === "achievement" ? "Game" : "Game (optional)"}
-            </label>
-            <input
-                type="text"
-                id="goal-game"
-                list="goal-game-options"
-                placeholder="Start typing a game..."
-                value={gameSearch}
-                onChange={(event) => {
-                    const typed = event.target.value;
-                    const match = games.find((game) => game.title === typed);
-                    setGameSearch(typed);
-                    setGameId(match ? match.id : "");
-                    setAchievementName("");
-                }}
-                required={type === "achievement"}
-            />
-            <datalist id="goal-game-options">
-                {games.map((game) => (
-                    <option key={game.id} value={game.title} />
-                ))}
-            </datalist>
-            {gameSearch && !selectedGame && (
-                <p className="field-hint">No game called "{gameSearch}" yet. Pick one from the list.</p>
-            )}
+                {type === "achievement" && (
+                    <div className="form-field">
+                        <label htmlFor={idPrefix + "achievement"} className="label">Achievement</label>
+                        <select
+                            id={idPrefix + "achievement"}
+                            value={achievementName}
+                            onChange={(event) => setAchievementName(event.target.value)}
+                            required
+                        >
+                            <option value="">{selectedGame ? "Pick an achievement" : "Pick a game first"}</option>
+                            {pickableAchievements.map((achievement) => (
+                                <option key={achievement.name} value={achievement.name}>
+                                    {achievement.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
-            {type === "achievement" && (
-                <>
-                    <label htmlFor="goal-achievement">Achievement</label>
-                    <select
-                        id="goal-achievement"
-                        value={achievementName}
-                        onChange={(event) => setAchievementName(event.target.value)}
-                        required
-                    >
-                        <option value="">Pick an achievement</option>
-                        {lockedAchievements.map((achievement) => (
-                            <option key={achievement.name} value={achievement.name}>
-                                {achievement.name}
-                            </option>
-                        ))}
-                    </select>
-                </>
-            )}
+                {type === "open" && (
+                    <div className="form-field">
+                        <label htmlFor={idPrefix + "target"} className="label">
+                            Number to reach <span className="optional">optional</span>
+                        </label>
+                        <input
+                            type="number"
+                            id={idPrefix + "target"}
+                            placeholder="e.g. 50"
+                            min="1"
+                            value={target}
+                            onChange={(event) => setTarget(event.target.value)}
+                        />
+                    </div>
+                )}
 
-            {type === "open" && (
-                <>
-                    <label htmlFor="goal-target">Target (optional, e.g. 50)</label>
-                    <input
-                        type="number"
-                        id="goal-target"
-                        min="1"
-                        value={target}
-                        onChange={(event) => setTarget(event.target.value)}
-                    />
-                </>
-            )}
+                <TagInput
+                    tags={tags}
+                    suggestions={getTagsForGame(goals, gameId)}
+                    onChange={setTags}
+                />
 
-            <div className="button-row">
-                <button type="submit">Add goal</button>
-                <button type="button" className="button-quiet" onClick={onCancel}>Cancel</button>
-            </div>
-        </form>
+                <div className="button-row">
+                    <button type="submit">{isEditing ? "Save changes" : "Add goal"}</button>
+                    <button type="button" className="button-quiet" onClick={onCancel}>Cancel</button>
+                </div>
+            </form>
+
+            <aside className="goal-preview" aria-label="Preview">
+                <p className="label">Preview</p>
+                <GoalCard goal={previewGoal} games={games} preview />
+            </aside>
+        </div>
     );
 }
 

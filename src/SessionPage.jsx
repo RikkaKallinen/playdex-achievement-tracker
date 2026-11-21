@@ -22,7 +22,8 @@ function SessionPage({
     onAddNewGoal,
     onToggleGoal,
     onDeleteGoal,
-    onUpdateGoalProgress
+    onUpdateGoalProgress,
+    onUpdateGoal
 }) {
     const [pickedGoalIds, setPickedGoalIds] = useState(lastKeptGoalIds);
     const [pickedGameIds, setPickedGameIds] = useState([]);
@@ -91,10 +92,12 @@ function SessionPage({
                         key={goal.id}
                         goal={goal}
                         games={games}
+                        goals={goals}
                         showGame={false}
                         onToggle={() => onToggleGoal(goal.id)}
                         onDelete={() => onDeleteGoal(goal.id)}
                         onProgressChange={(newProgress) => onUpdateGoalProgress(goal.id, newProgress)}
+                        onSave={(changes) => onUpdateGoal(goal.id, changes)}
                     />
                 ))}
             </div>
@@ -316,6 +319,7 @@ function SessionPage({
                     <div className="add-panel">
                         <AddGoalForm
                             games={activeGames}
+                            goals={goals}
                             onAddGoal={(newGoal) => {
                                 onAddNewGoal(newGoal);
                                 setIsAddingGoal(false);

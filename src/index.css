@@ -943,6 +943,194 @@ main {
     border-radius: 999px;
 }
 
+/* Game search dropdown (GameCombobox): floats under its text box and scrolls when the list is long */
+.game-combobox {
+    position: relative;
+}
+
+.game-combobox-list {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 0;
+    min-width: 100%;
+    width: max-content;
+    max-width: min(420px, 90vw);
+    max-height: 260px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+}
+
+.game-combobox-list li {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.game-combobox-list li.highlighted {
+    color: var(--text);
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.game-combobox-list .game-combobox-empty {
+    color: var(--text-muted);
+    cursor: default;
+}
+
+/* Goal form on the left, a live preview of the goal card on the right; stacked on narrower screens */
+.goal-form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    gap: 32px;
+    align-items: start;
+    max-width: 1000px;
+}
+
+.goal-preview {
+    position: sticky;
+    top: 16px;
+}
+
+.goal-preview .label {
+    margin-bottom: 6px;
+}
+
+.goal-preview .goal-card {
+    margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+    .goal-form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .goal-preview {
+        position: static;
+    }
+}
+
+/* The fields themselves: two columns (game beside number to reach), one column on phones */
+.goal-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.goal-form .wide,
+.goal-form .goal-type-toggle,
+.goal-form .button-row {
+    grid-column: 1 / -1;
+}
+
+.goal-form .goal-type-toggle {
+    margin-bottom: 0;
+}
+
+.goal-form .form-field > .label {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+/* The small "optional" next to a field name, quieter than the name itself */
+.optional {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: normal;
+    text-transform: none;
+    opacity: 0.7;
+}
+
+/* A fixed height, because Safari ignores padding on dropdowns and they came out shorter than the text boxes */
+.goal-form input,
+.goal-form select {
+    width: 100%;
+    height: 2.5rem;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.goal-form button {
+    margin: 0;
+}
+
+.goal-form .field-hint {
+    margin: 6px 0 0;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 560px) {
+    .goal-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Tag box: picked tags as pills inside it, the typing space after them */
+.tag-field {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: text;
+}
+
+.tag-field:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.goal-form .tag-field input {
+    flex: 1;
+    width: auto;
+    height: auto;
+    min-width: 140px;
+    padding: 2px 4px;
+    background: transparent;
+    border: none;
+}
+
+.goal-form .tag-field input:focus {
+    outline: none;
+}
+
+.tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding-right: 4px;
+}
+
+.goal-form .tag-remove {
+    display: inline-flex;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+}
+
+.tag-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.goal-form .tag-suggestions .field-hint {
+    margin: 0;
+}
+
 /* Game Tiles */
 .game-grid {
     display: grid;

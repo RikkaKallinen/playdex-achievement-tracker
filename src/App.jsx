@@ -337,6 +337,11 @@ function App() {
         }));
     }
 
+    // changes holds only the fields the edit form touched, e.g. { text, gameId, target, tags }
+    function updateGoal(goalId, changes) {
+        setGoals((currentGoals) => currentGoals.map((goal) => (goal.id === goalId ? { ...goal, ...changes } : goal)));
+    }
+
     function deleteGoal(goalId) {
         setGoals(goals.filter((goal) => goal.id !== goalId));
     }
@@ -550,6 +555,7 @@ function App() {
                                 onToggleGoal={toggleGoal}
                                 onDeleteGoal={deleteGoal}
                                 onUpdateGoalProgress={updateGoalProgress}
+                                onUpdateGoal={updateGoal}
                             />
                         }
                     />
@@ -572,6 +578,7 @@ function App() {
                                 onToggleGoal={toggleGoal}
                                 onDeleteGoal={deleteGoal}
                                 onUpdateGoalProgress={updateGoalProgress}
+                                onUpdateGoal={updateGoal}
                             />
                         }
                     />
