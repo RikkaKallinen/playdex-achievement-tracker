@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import GameSearchInput from "./GameSearchInput";
 import GamePicker from "./GamePicker";
 
@@ -186,6 +186,39 @@ export function SessionNoteForm({ games, sessionGames, onAdd, onCancel }) {
 
             <div className="button-row">
                 <button type="submit" disabled={!gameId}>Add note</button>
+                <button type="button" className="button-quiet" onClick={onCancel}>Cancel</button>
+            </div>
+        </form>
+    );
+}
+
+// One box per piece of writing on a journal card. fields: [{ key, label, text }]
+export function EditWritingForm({ fields, onSave, onCancel }) {
+    const idPrefix = useId();
+    const [texts, setTexts] = useState(() => fields.map((field) => field.text));
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        onSave(texts.map((text) => text.trim()));
+    }
+
+    return (
+        <form onSubmit={handleSubmit} className="session-note-form">
+            {fields.map((field, index) => (
+                <div key={field.key}>
+                    <label htmlFor={idPrefix + field.key}>{field.label}</label>
+                    <textarea
+                        id={idPrefix + field.key}
+                        rows="3"
+                        value={texts[index]}
+                        onChange={(event) => setTexts(texts.map((text, i) => (i === index ? event.target.value : text)))}
+                    />
+                </div>
+            ))}
+            <p className="stat-detail">Empty a box to remove that one.</p>
+
+            <div className="button-row">
+                <button type="submit">Save changes</button>
                 <button type="button" className="button-quiet" onClick={onCancel}>Cancel</button>
             </div>
         </form>

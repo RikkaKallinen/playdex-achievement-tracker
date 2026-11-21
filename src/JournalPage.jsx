@@ -3,7 +3,7 @@ import { buildJournalFeed } from "./journalFeed";
 import { NewEntryForm, PastSessionForm } from "./JournalForms";
 import JournalFeedList from "./JournalFeedList";
 
-function JournalPage({ games, goals, sessions, journalEntries, onDeleteSession, onDeleteEntry, onDeleteGoal, onAddEntry, onLogPastSession, onAddSessionNote, onUpdateAchievement }) {
+function JournalPage({ games, goals, sessions, journalEntries, onDeleteSession, onDeleteEntry, onDeleteGoal, onAddEntry, onLogPastSession, onAddSessionNote, onUpdateAchievement, onUpdateEntry, onUpdateSessionSummaries }) {
     const [openForm, setOpenForm] = useState(null);
     const activeGames = games.filter((game) => !game.deleted);
     const feed = buildJournalFeed({ games, goals, sessions, journalEntries });
@@ -54,6 +54,8 @@ function JournalPage({ games, goals, sessions, journalEntries, onDeleteSession, 
                 onAddEntry={onAddEntry}
                 onDeleteSession={onDeleteSession}
                 onDeleteEntry={onDeleteEntry}
+                onUpdateEntry={onUpdateEntry}
+                onUpdateSessionSummaries={onUpdateSessionSummaries}
                 onDeleteGoal={onDeleteGoal}
             />
         </section>

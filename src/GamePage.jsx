@@ -14,7 +14,7 @@ import { NewEntryForm } from "./JournalForms";
 import JournalFeedList from "./JournalFeedList";
 import SlidingHighlight from "./SlidingHighlight";
 
-function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievement, onUpdateGameCover, onUpdateGame, onAddJournalEntry, onDeleteJournalEntry, onDeleteSession, onAddSessionNote, onDeleteGoal }) {
+function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, onToggleAchievement, onDeleteAchievement, onUpdateAchievement, onUpdateGameCover, onUpdateGame, onAddJournalEntry, onDeleteJournalEntry, onUpdateJournalEntry, onDeleteSession, onAddSessionNote, onUpdateSessionSummaries, onDeleteGoal }) {
     const { gameId } = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
     const game = games.find((game) => game.id === gameId);
@@ -270,6 +270,8 @@ function GamePage({ games, goals, sessions, journalEntries, onAddAchievement, on
                         onAddEntry={onAddJournalEntry}
                         onDeleteSession={onDeleteSession}
                         onDeleteEntry={onDeleteJournalEntry}
+                        onUpdateEntry={onUpdateJournalEntry}
+                        onUpdateSessionSummaries={onUpdateSessionSummaries}
                         onDeleteGoal={onDeleteGoal}
                     />
                 </section>

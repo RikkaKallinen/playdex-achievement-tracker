@@ -2176,8 +2176,15 @@ details summary {
     margin: 0;
 }
 
-.journal-add-note {
+/* The + Add and Edit buttons along the bottom-left of a journal card */
+.journal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 10px;
+}
+
+.journal-add-note {
     padding: 4px 10px;
     font-size: 0.85rem;
 }

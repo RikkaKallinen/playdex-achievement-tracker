@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { NotebookPen, Target, Trophy, X, Zap } from "lucide-react";
 import { groupByDay } from "./journalFeed";
 import { cleanDescription } from "./summaryStats";
-import { AchievementStoryForm, SessionNoteForm } from "./JournalForms";
+import { AchievementStoryForm, EditWritingForm, SessionNoteForm } from "./JournalForms";
 import SlidingHighlight from "./SlidingHighlight";
 
 const filters = [
@@ -92,10 +92,19 @@ function TypePill({ Icon, label }) {
     );
 }
 
-function JournalItem({ item, games, currentGameId, onDeleteSession, onDeleteEntry, onDeleteGoal, onAddSessionNote, onUpdateAchievement, onAddEntry }) {
+function EditButton({ label, onClick }) {
+    return (
+        <button type="button" className="button-quiet journal-add-note" onClick={onClick}>
+            ✎ Edit {label}
+        </button>
+    );
+}
+
+function JournalItem({ item, games, currentGameId, onDeleteSession, onDeleteEntry, onDeleteGoal, onAddSessionNote, onUpdateAchievement, onAddEntry, onUpdateEntry, onUpdateSessionSummaries }) {
     const [isAddingNote, setIsAddingNote] = useState(false);
     const [showAllUnlocks, setShowAllUnlocks] = useState(false);
     const [isAddingStory, setIsAddingStory] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     if (item.type === "session") {
         return (
@@ -113,7 +122,22 @@ function JournalItem({ item, games, currentGameId, onDeleteSession, onDeleteEntr
                         {item.minutes !== null && <> · {formatMinutes(item.minutes)}</>}
                         {item.goalsTotal > 0 && <> · {item.goalsDone} of {item.goalsTotal} goals done</>}
                     </p>
-                    {item.summaries.map((summary, index) => (
+                    {isEditing ? (
+                        <div className="add-panel journal-note-panel">
+                            <EditWritingForm
+                                fields={item.summaries.map((summary, index) => ({
+                                    key: index,
+                                    label: summary.game ? summary.game.title : "Note",
+                                    text: summary.text
+                                }))}
+                                onSave={(texts) => {
+                                    onUpdateSessionSummaries(item.sourceId, texts);
+                                    setIsEditing(false);
+                                }}
+                                onCancel={() => setIsEditing(false)}
+                            />
+                        </div>
+                    ) : item.summaries.map((summary, index) => (
                         <blockquote key={index} className="journal-quote">
                             {summary.game && <span className="journal-quote-game">{summary.game.title}</span>}
                             {summary.text}
@@ -131,10 +155,18 @@ function JournalItem({ item, games, currentGameId, onDeleteSession, onDeleteEntr
                                 onCancel={() => setIsAddingNote(false)}
                             />
                         </div>
-                    ) : (
-                        <button type="button" className="button-quiet journal-add-note" onClick={() => setIsAddingNote(true)}>
-                            + Add a note
-                        </button>
+                    ) : !isEditing && (
+                        <div className="journal-actions">
+                            <button type="button" className="button-quiet journal-add-note" onClick={() => setIsAddingNote(true)}>
+                                + Add a note
+                            </button>
+                            {item.summaries.length > 0 && (
+                                <EditButton
+                                    label={item.summaries.length === 1 ? "note" : "notes"}
+                                    onClick={() => setIsEditing(true)}
+                                />
+                            )}
+                        </div>
                     )}
                 </div>
                 <DeleteButton label="session" onDelete={() => onDeleteSession(item.sourceId)} />
@@ -149,7 +181,25 @@ function JournalItem({ item, games, currentGameId, onDeleteSession, onDeleteEntr
                 <div className="journal-body">
                     <GameLinks games={[item.game]} toJournal currentGameId={currentGameId} />
                     <p className="journal-kind"><TypePill Icon={NotebookPen} label="Journal entry" /></p>
-                    <p className="journal-text">{item.text}</p>
+                    {isEditing ? (
+                        <div className="add-panel journal-note-panel">
+                            <EditWritingForm
+                                fields={[{ key: "entry", label: "Entry", text: item.text }]}
+                                onSave={([text]) => {
+                                    onUpdateEntry(item.sourceId, text);
+                                    setIsEditing(false);
+                                }}
+                                onCancel={() => setIsEditing(false)}
+                            />
+                        </div>
+                    ) : (
+                        <>
+                            <p className="journal-text">{item.text}</p>
+                            <div className="journal-actions">
+                                <EditButton label="entry" onClick={() => setIsEditing(true)} />
+                            </div>
+                        </>
+                    )}
                 </div>
                 <DeleteButton label="journal entry" onDelete={() => onDeleteEntry(item.sourceId)} />
             </article>
@@ -169,6 +219,9 @@ function JournalItem({ item, games, currentGameId, onDeleteSession, onDeleteEntr
             </article>
         );
     }
+
+    const dayNotes = item.dayNotes || [];
+    const stories = item.achievements.filter((achievement) => achievement.notes);
 
     return (
         <article className="journal-item">
@@ -206,30 +259,51 @@ function JournalItem({ item, games, currentGameId, onDeleteSession, onDeleteEntr
                         </li>
                     )}
                 </ul>
-                {(item.dayNotes || []).map((note) => (
-                    <blockquote key={note.id} className="journal-quote journal-day-note">
-                        <span className="journal-quote-game">General</span>
-                        {note.text}
-                        <button
-                            type="button"
-                            className="icon-button journal-note-delete"
-                            aria-label="Delete this note"
-                            onClick={() => {
-                                if (confirm("Delete this note? This can't be undone.")) {
-                                    onDeleteEntry(note.id);
-                                }
+                {isEditing ? (
+                    <div className="add-panel journal-note-panel">
+                        <EditWritingForm
+                            fields={[
+                                ...dayNotes.map((note) => ({ key: "note-" + note.id, label: "General", text: note.text })),
+                                ...stories.map((achievement) => ({ key: "story-" + achievement.name, label: achievement.name, text: achievement.notes }))
+                            ]}
+                            onSave={(texts) => {
+                                dayNotes.forEach((note, index) => onUpdateEntry(note.id, texts[index]));
+                                stories.forEach((achievement, index) => {
+                                    onUpdateAchievement(item.game.id, achievement.name, { notes: texts[dayNotes.length + index] });
+                                });
+                                setIsEditing(false);
                             }}
-                        >
-                            <X size={14} aria-hidden="true" />
-                        </button>
-                    </blockquote>
-                ))}
-                {item.achievements.filter((achievement) => achievement.notes).map((achievement) => (
-                    <blockquote key={achievement.name} className="journal-quote">
-                        <span className="journal-quote-game">{achievement.name}</span>
-                        {achievement.notes}
-                    </blockquote>
-                ))}
+                            onCancel={() => setIsEditing(false)}
+                        />
+                    </div>
+                ) : (
+                    <>
+                        {dayNotes.map((note) => (
+                            <blockquote key={note.id} className="journal-quote journal-day-note">
+                                <span className="journal-quote-game">General</span>
+                                {note.text}
+                                <button
+                                    type="button"
+                                    className="icon-button journal-note-delete"
+                                    aria-label="Delete this note"
+                                    onClick={() => {
+                                        if (confirm("Delete this note? This can't be undone.")) {
+                                            onDeleteEntry(note.id);
+                                        }
+                                    }}
+                                >
+                                    <X size={14} aria-hidden="true" />
+                                </button>
+                            </blockquote>
+                        ))}
+                        {stories.map((achievement) => (
+                            <blockquote key={achievement.name} className="journal-quote">
+                                <span className="journal-quote-game">{achievement.name}</span>
+                                {achievement.notes}
+                            </blockquote>
+                        ))}
+                    </>
+                )}
                 {isAddingStory ? (
                     <div className="add-panel journal-note-panel">
                         <AchievementStoryForm
@@ -245,10 +319,18 @@ function JournalItem({ item, games, currentGameId, onDeleteSession, onDeleteEntr
                             onCancel={() => setIsAddingStory(false)}
                         />
                     </div>
-                ) : (
-                    <button type="button" className="button-quiet journal-add-note" onClick={() => setIsAddingStory(true)}>
-                        + Add a story
-                    </button>
+                ) : !isEditing && (
+                    <div className="journal-actions">
+                        <button type="button" className="button-quiet journal-add-note" onClick={() => setIsAddingStory(true)}>
+                            + Add a story
+                        </button>
+                        {dayNotes.length + stories.length > 0 && (
+                            <EditButton
+                                label={dayNotes.length + stories.length === 1 ? "story" : "stories"}
+                                onClick={() => setIsEditing(true)}
+                            />
+                        )}
+                    </div>
                 )}
             </div>
         </article>

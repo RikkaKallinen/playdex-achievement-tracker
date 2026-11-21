@@ -287,7 +287,7 @@ function App() {
     }
 
     function updateAchievement(gameId, achievementName, changes) {
-        setGames(games.map((game) => {
+        setGames((currentGames) => currentGames.map((game) => {
             if (game.id !== gameId) {
                 return game;
             }
@@ -463,6 +463,29 @@ function App() {
         setJournalEntries(journalEntries.filter((entry) => entry.id !== entryId));
     }
 
+    // Saving an empty entry removes it
+    function updateJournalEntry(entryId, text) {
+        setJournalEntries((currentEntries) => (text
+            ? currentEntries.map((entry) => (entry.id === entryId ? { ...entry, text: text } : entry))
+            : currentEntries.filter((entry) => entry.id !== entryId)));
+    }
+
+    // texts lines up with session.summaries; an emptied note is removed
+    function updateSessionSummaries(sessionId, texts) {
+        setSessions((currentSessions) => currentSessions.map((session) => {
+            if (session.id !== sessionId) {
+                return session;
+            }
+
+            return {
+                ...session,
+                summaries: session.summaries
+                    .map((summary, index) => ({ ...summary, text: texts[index] }))
+                    .filter((summary) => summary.text)
+            };
+        }));
+    }
+
     function togglePlatform(platform) {
         if (hiddenPlatforms.includes(platform)) {
             setHiddenPlatforms(hiddenPlatforms.filter((hiddenPlatform) => hiddenPlatform !== platform));
@@ -509,8 +532,10 @@ function App() {
                                 journalEntries={journalEntries}
                                 onAddJournalEntry={addJournalEntry}
                                 onDeleteJournalEntry={deleteJournalEntry}
+                                onUpdateJournalEntry={updateJournalEntry}
                                 onDeleteSession={deleteSession}
                                 onAddSessionNote={addSessionNote}
+                                onUpdateSessionSummaries={updateSessionSummaries}
                                 onDeleteGoal={deleteGoal}
                             />
                         }
@@ -564,6 +589,8 @@ function App() {
                                 onAddSessionNote={addSessionNote}
                                 onUpdateAchievement={updateAchievement}
                                 onDeleteEntry={deleteJournalEntry}
+                                onUpdateEntry={updateJournalEntry}
+                                onUpdateSessionSummaries={updateSessionSummaries}
                                 onDeleteGoal={deleteGoal}
                             />
                         }
