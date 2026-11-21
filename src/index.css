@@ -1577,6 +1577,38 @@ details summary {
     color: var(--text-muted);
 }
 
+/* Settings → Steam: who's signed in, with their Steam picture and a Sign out button */
+.steam-account {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.steam-account-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+}
+
+.steam-account-name {
+    margin: 0;
+    font-weight: 600;
+}
+
+.steam-account .stat-detail {
+    margin: 2px 0 0;
+}
+
+.steam-id-details {
+    margin-bottom: 12px;
+}
+
+.steam-id-details .settings-fields {
+    margin-top: 8px;
+}
+
 /* Accent color picker */
 .swatch-button {
     font-weight: normal;

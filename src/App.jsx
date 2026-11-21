@@ -120,6 +120,29 @@ function App() {
         localStorage.setItem("playdex-profile", JSON.stringify(profile));
     }, [profile]);
 
+    // Who's signed in through Steam: null while still asking the server, then { signedIn, steamId, name, avatarUrl }
+    const [account, setAccount] = useState(null);
+
+    useEffect(() => {
+        fetch("/api/auth/me")
+            .then((response) => (response.ok ? response.json() : { signedIn: false }))
+            .catch(() => ({ signedIn: false }))
+            .then((me) => {
+                setAccount(me);
+                // Signing in fills the Steam ID (and the name, if you hadn't set one) so Sync works straight away
+                if (me.signedIn) {
+                    setProfile((current) => (current.steamId === me.steamId
+                        ? current
+                        : { ...current, steamId: me.steamId, name: current.name || me.name || "" }));
+                }
+            });
+    }, []);
+
+    function signOut() {
+        fetch("/api/auth/signout", { method: "POST" })
+            .finally(() => setAccount({ signedIn: false }));
+    }
+
     function updateProfile(changes) {
         setProfile((current) => ({ ...current, ...changes }));
     }
@@ -641,6 +664,9 @@ function App() {
                         path="/settings"
                         element={
                             <SettingsPage
+                                key={profile.steamId || "no-steam-id"}
+                                account={account}
+                                onSignOut={signOut}
                                 games={activeGames}
                                 hiddenPlatforms={hiddenPlatforms}
                                 onTogglePlatform={togglePlatform}

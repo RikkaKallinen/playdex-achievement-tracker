@@ -1,12 +1,16 @@
 import { useRef, useState } from "react";
+import { useSearchParams } from "react-router";
 import { platformNames, accentColors, fontOptions } from "./data";
 import { cropImage } from "./resizeImage";
 import AvatarCropper from "./AvatarCropper";
 import { downloadBackup, readBackupFile } from "./backup";
 import { formatDate } from "./formatDate";
 
-function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent, fontChoice, onChangeFont, profile, onUpdateProfile, onSyncSteam, isSyncing, syncStatus, onBuildBackup, onRestoreBackup }) {
+function SettingsPage({ account, onSignOut, games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent, fontChoice, onChangeFont, profile, onUpdateProfile, onSyncSteam, isSyncing, syncStatus, onBuildBackup, onRestoreBackup }) {
     const [draft, setDraft] = useState(profile);
+    // Steam sends people back to /settings?signin=ok (or =failed)
+    const [searchParams] = useSearchParams();
+    const signInResult = searchParams.get("signin");
     const [restoreStatus, setRestoreStatus] = useState("");
     const restoreInputRef = useRef(null);
     const [cropSource, setCropSource] = useState(null);
@@ -199,17 +203,42 @@ function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, o
             </p>
 
             <h3>Steam</h3>
-            <div className="settings-fields">
-                <label htmlFor="steam-id">Steam ID</label>
-                <input
-                    type="text"
-                    id="steam-id"
-                    inputMode="numeric"
-                    placeholder="7656119..."
-                    value={draft.steamId || ""}
-                    onChange={(event) => updateDraft({ steamId: event.target.value.trim() })}
-                />
-            </div>
+            {signInResult === "failed" && (
+                <p className="field-hint">Steam sign-in didn't work. Try again.</p>
+            )}
+            {account && account.signedIn ? (
+                <div className="steam-account">
+                    {account.avatarUrl && <img src={account.avatarUrl} alt="" className="steam-account-avatar" />}
+                    <div>
+                        <p className="steam-account-name">Signed in as {account.name || "your Steam account"}</p>
+                        <p className="stat-detail">Steam ID {account.steamId}</p>
+                    </div>
+                    <button type="button" className="button-quiet" onClick={onSignOut}>Sign out</button>
+                </div>
+            ) : (
+                <>
+                    <p>
+                        {/* A full page change, not a React route: Steam's login page is a different website */}
+                        <button type="button" onClick={() => window.location.assign("/api/auth/steam")}>
+                            Sign in through Steam
+                        </button>
+                    </p>
+                    <details className="steam-id-details">
+                        <summary>Or type your Steam ID</summary>
+                        <div className="settings-fields">
+                            <label htmlFor="steam-id">Steam ID</label>
+                            <input
+                                type="text"
+                                id="steam-id"
+                                inputMode="numeric"
+                                placeholder="7656119..."
+                                value={draft.steamId || ""}
+                                onChange={(event) => updateDraft({ steamId: event.target.value.trim() })}
+                            />
+                        </div>
+                    </details>
+                </>
+            )}
             <div className="button-row">
                 <button type="button" onClick={onSyncSteam} disabled={!profile.steamId || hasChanges || isSyncing}>
                     Sync with Steam

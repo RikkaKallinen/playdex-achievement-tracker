@@ -1,8 +1,11 @@
 import express from "express";
 import { findProgressStat, findTargetInDescription } from "../src/progressMatch.js";
+import { addAuthRoutes } from "./auth.js";
 
 const app = express();
 const port = 3001;
+
+addAuthRoutes(app);
 
 async function findCoverUrl(appId) {
     const simpleUrl = "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/header.jpg";
