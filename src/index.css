@@ -1885,6 +1885,174 @@ details summary {
     color: var(--accent);
 }
 
+/* Welcome page (signed out): sign-in on the left, rolling feature clips on the right */
+.welcome {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 32px 64px;
+}
+
+.welcome-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 56px;
+}
+
+.welcome-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 48px;
+    align-items: center;
+}
+
+.welcome-copy h2 {
+    margin: 0 0 16px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+}
+
+.welcome-copy p {
+    max-width: 46ch;
+}
+
+.welcome-signin {
+    margin: 12px 0;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+}
+
+.welcome-demo {
+    padding: 20px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.welcome-demo .filter-chips {
+    margin-bottom: 16px;
+}
+
+/* A fixed-height stage, so the page doesn't jump as clips of different sizes swap in */
+.welcome-stage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 320px;
+    animation: page-in 0.4s var(--ease-gentle);
+}
+
+.welcome-clip-stack .achievement-card,
+.welcome-clip-stack .goal-card {
+    margin-bottom: 12px;
+}
+
+.welcome-session {
+    grid-template-columns: 1fr auto;
+}
+
+.welcome-session-games {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    grid-column: 1 / -1;
+}
+
+.welcome-journal .label {
+    margin-bottom: 8px;
+}
+
+/* Blinking cursor at the end of the typed journal entry */
+.welcome-caret {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    background: var(--accent);
+    animation: paused-blink 1s steps(2) infinite;
+}
+
+/* The thin bar that fills while a clip plays */
+.welcome-timer {
+    height: 3px;
+    margin-top: 16px;
+    border-radius: 2px;
+    background: var(--surface-raised);
+}
+
+.welcome-timer.playing {
+    background:
+        linear-gradient(var(--accent), var(--accent)) left / 0% 100% no-repeat,
+        var(--surface-raised);
+    animation: welcome-timer-fill 6s linear forwards;
+}
+
+@keyframes welcome-timer-fill {
+    to { background-size: 100% 100%, auto; }
+}
+
+.welcome-caption {
+    margin: 10px 0 0;
+    color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+    .welcome-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome {
+        padding: 16px 16px 48px;
+    }
+
+    .welcome-header {
+        margin-bottom: 32px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .welcome-stage,
+    .welcome-caret {
+        animation: none;
+    }
+}
+
+/* First sign-in: "Move this browser's Playdex to your account?" */
+.move-data {
+    max-width: 560px;
+    margin: 64px auto;
+    padding: 24px;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+}
+
+/* Whose Playdex is in this browser: its name, picture and counts */
+.move-data-owner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    margin: 12px 0;
+    background: var(--surface-raised);
+    border-radius: 8px;
+}
+
+.move-data-owner img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.move-data-owner .stat-detail {
+    margin: 2px 0 0;
+}
+
 .loading-message {
     padding: 32px;
     color: var(--text-muted);
@@ -2857,4 +3025,10 @@ button,
     button:active:not(:disabled) {
         transform: scale(0.93);
     }
+}
+
+/* The "Game details must be Public" note under Sync with Steam */
+.sync-note {
+    max-width: 60ch;
+    margin: 8px 0 16px;
 }

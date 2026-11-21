@@ -1,7 +1,7 @@
 import { starterGames } from "./data";
 import { mergeSteamGames } from "./steamSync";
 import { repairGoalLinks } from "./goalStatus";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { get, set } from "idb-keyval";
 import { Routes, Route } from "react-router";
 import GoalsPage from "./GoalsPage";
@@ -13,13 +13,28 @@ import SummaryPage from "./SummaryPage";
 import SettingsPage from "./SettingsPage";
 import Sidebar from "./Sidebar";
 import ScrollToTop from "./ScrollToTop";
+import WelcomePage from "./WelcomePage";
+import { useServerSave, saveAllParts } from "./useServerSave";
 
 function App() {
+    // Where your data lives:
+    // "checking" until we know whether you're signed in, "browser" when signed out (the welcome page shows; this browser's
+    // old copy is only kept for the one-time move), "error" when signed in but the account couldn't be loaded,
+    // "choosing" when you've signed in to an empty account and we're asking whether to move this browser's data up,
+    // "server" when signed in (loaded from and saved to your account)
+    const [storage, setStorage] = useState("checking");
+    // Set once your account's data arrives, so the slower browser copy can't overwrite it if it finishes loading later
+    const loadedFromServer = useRef(false);
+
     const [games, setGames] = useState([]);
     const [gamesLoaded, setGamesLoaded] = useState(false);
 
     useEffect(() => {
         get("playdex-games").then((savedGames) => {
+            if (loadedFromServer.current) {
+                return;
+            }
+
             const oldGames = localStorage.getItem("playdex-games");
             if (savedGames) {
                 setGames(savedGames);
@@ -37,14 +52,14 @@ function App() {
     const activeGames = sortedGames.filter((game) => !game.deleted);
 
     useEffect(() => {
-        if (!gamesLoaded) {
+        if (!gamesLoaded || storage !== "browser") {
             return;
         }
 
         set("playdex-games", games)
             .then(() => localStorage.removeItem("playdex-games"))
             .catch((error) => console.error("Couldn't save your games", error));
-    }, [games, gamesLoaded]);
+    }, [games, gamesLoaded, storage]);
 
     const [goals, setGoals] = useState(() => {
         const savedGoals = localStorage.getItem("playdex-goals");
@@ -52,8 +67,10 @@ function App() {
     });
 
     useEffect(() => {
-        localStorage.setItem("playdex-goals", JSON.stringify(goals));
-    }, [goals]);
+        if (storage === "browser") {
+            localStorage.setItem("playdex-goals", JSON.stringify(goals));
+        }
+    }, [goals, storage]);
 
     useEffect(() => {
         if (!gamesLoaded) {
@@ -72,8 +89,10 @@ function App() {
     const lastKeptGoalIds = endedSessions.length > 0 ? endedSessions[endedSessions.length - 1].keptGoalIds || [] : [];
 
     useEffect(() => {
-        localStorage.setItem("playdex-sessions", JSON.stringify(sessions));
-    }, [sessions]);
+        if (storage === "browser") {
+            localStorage.setItem("playdex-sessions", JSON.stringify(sessions));
+        }
+    }, [sessions, storage]);
 
     const [journalEntries, setJournalEntries] = useState(() => {
         const savedEntries = localStorage.getItem("playdex-journal");
@@ -81,8 +100,10 @@ function App() {
     });
 
     useEffect(() => {
-        localStorage.setItem("playdex-journal", JSON.stringify(journalEntries));
-    }, [journalEntries]);
+        if (storage === "browser") {
+            localStorage.setItem("playdex-journal", JSON.stringify(journalEntries));
+        }
+    }, [journalEntries, storage]);
 
     const [hiddenPlatforms, setHiddenPlatforms] = useState(() => {
         const savedHiddenPlatforms = localStorage.getItem("playdex-hidden-platforms");
@@ -90,26 +111,32 @@ function App() {
     });
 
     useEffect(() => {
-        localStorage.setItem("playdex-hidden-platforms", JSON.stringify(hiddenPlatforms));
-    }, [hiddenPlatforms]);
+        if (storage === "browser") {
+            localStorage.setItem("playdex-hidden-platforms", JSON.stringify(hiddenPlatforms));
+        }
+    }, [hiddenPlatforms, storage]);
 
     const [accentColor, setAccentColor] = useState(() => {
         return localStorage.getItem("playdex-accent") || "purple";
     });
 
     useEffect(() => {
-        localStorage.setItem("playdex-accent", accentColor);
+        if (storage === "browser") {
+            localStorage.setItem("playdex-accent", accentColor);
+        }
         document.documentElement.dataset.accent = accentColor;
-    }, [accentColor]);
+    }, [accentColor, storage]);
 
     const [fontChoice, setFontChoice] = useState(() => {
         return localStorage.getItem("playdex-font") || "default";
     });
 
     useEffect(() => {
-        localStorage.setItem("playdex-font", fontChoice);
+        if (storage === "browser") {
+            localStorage.setItem("playdex-font", fontChoice);
+        }
         document.documentElement.dataset.font = fontChoice;
-    }, [fontChoice]);
+    }, [fontChoice, storage]);
 
     const [profile, setProfile] = useState(() => {
         const savedProfile = localStorage.getItem("playdex-profile");
@@ -117,30 +144,127 @@ function App() {
     });
 
     useEffect(() => {
-        localStorage.setItem("playdex-profile", JSON.stringify(profile));
-    }, [profile]);
+        if (storage === "browser") {
+            localStorage.setItem("playdex-profile", JSON.stringify(profile));
+        }
+    }, [profile, storage]);
 
     // Who's signed in through Steam: null while still asking the server, then { signedIn, steamId, name, avatarUrl }
     const [account, setAccount] = useState(null);
 
+    // A brand-new profile from someone's Steam account, for fresh starts and accounts with no saved settings
+    function freshProfile(me) {
+        return { name: me.name || "", avatarUrl: me.avatarUrl || "", gamertags: [], steamId: me.steamId };
+    }
+
+    // Puts an account's saved parts on screen. Anything the account hasn't saved starts empty or at the default,
+    // so nothing from this browser's copy (which may be someone else's) can ever end up in another account
+    function applySavedParts(saved, me) {
+        loadedFromServer.current = true;
+        setGames(saved.games || []);
+        setGoals(saved.goals || []);
+        setSessions(saved.sessions || []);
+        setJournalEntries(saved.journalEntries || []);
+        const settings = saved.settings || {};
+        setHiddenPlatforms(settings.hiddenPlatforms || []);
+        setAccentColor(settings.accentColor || "purple");
+        setFontChoice(settings.fontChoice || "default");
+        setProfile(settings.profile ? { ...settings.profile, steamId: me.steamId } : freshProfile(me));
+        setGamesLoaded(true);
+    }
+
     useEffect(() => {
-        fetch("/api/auth/me")
+        // Time limits, so a slow or stuck server can never leave you on "Loading your games…" forever
+        fetch("/api/auth/me", { signal: AbortSignal.timeout(8000) })
             .then((response) => (response.ok ? response.json() : { signedIn: false }))
             .catch(() => ({ signedIn: false }))
-            .then((me) => {
+            .then(async (me) => {
                 setAccount(me);
-                // Signing in fills the Steam ID (and the name, if you hadn't set one) so Sync works straight away
-                if (me.signedIn) {
-                    setProfile((current) => (current.steamId === me.steamId
-                        ? current
-                        : { ...current, steamId: me.steamId, name: current.name || me.name || "" }));
+                if (!me.signedIn) {
+                    setStorage("browser");
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/api/data", { signal: AbortSignal.timeout(20000) });
+                    if (!response.ok) {
+                        throw new Error("Status " + response.status);
+                    }
+                    const saved = await response.json();
+
+                    if (Object.keys(saved).length > 0) {
+                        applySavedParts(saved, me);
+                        setStorage("server");
+                        return;
+                    }
+
+                    // A new account. Whose Playdex is in this browser? Its profile remembers the Steam ID it was
+                    // used with, and a browser copy only ever moves into one account. If it's clearly someone
+                    // else's, don't offer it at all
+                    const browserProfile = JSON.parse(localStorage.getItem("playdex-profile") || "{}");
+                    const movedTo = localStorage.getItem("playdex-moved-to");
+                    const someoneElses = (browserProfile.steamId && browserProfile.steamId !== me.steamId)
+                        || (movedTo && movedTo !== me.steamId);
+
+                    if (someoneElses) {
+                        startAccountFresh(me);
+                    } else {
+                        setStorage("choosing");
+                    }
+                } catch (error) {
+                    console.error("Couldn't load your account's data", error);
+                    setStorage("error");
                 }
             });
     }, []);
 
+    // A fresh page load, so everything comes back from this browser's copy instead of the account
     function signOut() {
         fetch("/api/auth/signout", { method: "POST" })
-            .finally(() => setAccount({ signedIn: false }));
+            .finally(() => window.location.reload());
+    }
+
+    // The five parts saved to your account, matching the backup file. Settings bundles the smaller bits together
+    const settingsPart = useMemo(
+        () => ({ hiddenPlatforms: hiddenPlatforms, accentColor: accentColor, fontChoice: fontChoice, profile: profile }),
+        [hiddenPlatforms, accentColor, fontChoice, profile]
+    );
+    const savingToServer = storage === "server";
+    useServerSave("games", games, savingToServer);
+    useServerSave("goals", goals, savingToServer);
+    useServerSave("sessions", sessions, savingToServer);
+    useServerSave("journalEntries", journalEntries, savingToServer);
+    useServerSave("settings", settingsPart, savingToServer);
+
+    // First sign-in to an empty account: copy everything in this browser up to it
+    const [isMovingData, setIsMovingData] = useState(false);
+    const [moveError, setMoveError] = useState("");
+
+    async function moveBrowserDataToAccount() {
+        setIsMovingData(true);
+        setMoveError("");
+        try {
+            const movedProfile = { ...profile, steamId: account.steamId };
+            await saveAllParts({ games, goals, sessions, journalEntries, settings: { ...settingsPart, profile: movedProfile } });
+            // Remember which account this browser's copy went to, so it's never offered to anyone else
+            localStorage.setItem("playdex-moved-to", account.steamId);
+            loadedFromServer.current = true;
+            setProfile(movedProfile);
+            setStorage("server");
+        } catch {
+            setMoveError("Something didn't save. Check the server is running and try again.");
+        }
+        setIsMovingData(false);
+    }
+
+    // ...or start the account completely empty: no games, default settings, a profile from your Steam account.
+    // This browser's copy stays untouched either way
+    function startAccountFresh(me) {
+        applySavedParts({}, me);
+        setStorage("server");
+        // Saving settings marks the account as set up, so this question isn't asked again next time
+        saveAllParts({ settings: { hiddenPlatforms: [], accentColor: "purple", fontChoice: "default", profile: freshProfile(me) } })
+            .catch((error) => console.error("Couldn't save your settings", error));
     }
 
     function updateProfile(changes) {
@@ -176,15 +300,34 @@ function App() {
             });
         }
 
+        // A game whose achievements fail to load keeps the ones already saved (it just gets no `achievements` here).
+        // If Steam keeps refusing (it limits how many requests it takes in a short time) or the profile hides
+        // game details, stop asking: games and hours played still update below
+        let failedInARow = 0;
+        let achievementProblem = null;
+
         for (let index = 0; index < steamGames.length; index++) {
             const steamGame = steamGames[index];
             setSyncStatus("Getting achievements " + (index + 1) + " of " + steamGames.length + ": " + steamGame.title);
 
             const achievementsResponse = await fetch("/api/steam/achievements?steamId=" + profile.steamId + "&appId=" + steamGame.steamAppId);
             if (achievementsResponse.ok) {
+                failedInARow = 0;
                 const achievementData = await achievementsResponse.json();
                 steamGame.achievements = achievementData.achievements;
                 steamGame.stats = achievementData.stats;
+                continue;
+            }
+
+            failedInARow++;
+            const { error } = await achievementsResponse.json().catch(() => ({}));
+            if (error === "private") {
+                achievementProblem = "private";
+                break;
+            }
+            if (failedInARow >= 5) {
+                achievementProblem = "busy";
+                break;
             }
         }
 
@@ -209,7 +352,15 @@ function App() {
         }
 
         setGames((currentGames) => mergeSteamGames(currentGames, steamGames));
-        setSyncStatus("Synced " + steamGames.length + " games from Steam.");
+        if (achievementProblem === "private") {
+            setSyncStatus("Synced " + steamGames.length + " games, but Steam keeps this profile's achievements private. "
+                + "In Steam, go to Edit Profile → Privacy Settings and set Game details to Public, then sync again.");
+        } else if (achievementProblem === "busy") {
+            setSyncStatus("Synced " + steamGames.length + " games, but Steam is limiting requests right now, so achievements "
+                + "weren't updated (your saved ones are kept). Try syncing again in an hour or so.");
+        } else {
+            setSyncStatus("Synced " + steamGames.length + " games from Steam.");
+        }
         setIsSyncing(false);
     }
 
@@ -553,8 +704,55 @@ function App() {
         }
     }
 
-    if (!gamesLoaded) {
+    // Signed out: the welcome page. Steam sends failed sign-ins back with ?signin=failed
+    if (storage === "browser") {
+        return <WelcomePage signInFailed={new URLSearchParams(window.location.search).get("signin") === "failed"} />;
+    }
+
+    if (!gamesLoaded || storage === "checking") {
         return <p className="loading-message">Loading your games…</p>;
+    }
+
+    if (storage === "error") {
+        return (
+            <main className="move-data">
+                <h2>Couldn't load your Playdex</h2>
+                <p>Your account didn't answer in time. Check the server is running, then try again.</p>
+                <div className="button-row">
+                    <button type="button" onClick={() => window.location.reload()}>Try again</button>
+                    <button type="button" className="button-quiet" onClick={signOut}>Sign out</button>
+                </div>
+            </main>
+        );
+    }
+
+    if (storage === "choosing") {
+        return (
+            <main className="move-data">
+                <h2>Welcome, {(account && account.name) || "player"}</h2>
+                <p>Your account is new. This browser already has a Playdex saved in it:</p>
+                <div className="move-data-owner">
+                    {profile.avatarUrl && <img src={profile.avatarUrl} alt="" />}
+                    <div>
+                        <p className="steam-account-name">{profile.name || "No name set"}</p>
+                        <p className="stat-detail">
+                            {games.filter((game) => !game.deleted).length} games, {goals.length} goals,
+                            {" "}{sessions.length} sessions, {journalEntries.length} journal entries
+                        </p>
+                    </div>
+                </div>
+                <p><strong>Is this yours?</strong> Only move it if it is. It can only be moved into one account.</p>
+                <div className="button-row">
+                    <button type="button" onClick={moveBrowserDataToAccount} disabled={isMovingData}>
+                        {isMovingData ? "Moving…" : "Yes, move it to my account"}
+                    </button>
+                    <button type="button" className="button-quiet" onClick={() => startAccountFresh(account)} disabled={isMovingData}>
+                        No, start fresh
+                    </button>
+                </div>
+                {moveError && <p className="field-hint">{moveError}</p>}
+            </main>
+        );
     }
 
     return (

@@ -157,12 +157,26 @@ app.get("/api/steam/achievements", async (request, response) => {
 
     const playerResponse = await fetch("https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?" + params);
 
+    // Only "Requested app has no stats" really means the game has no achievements. Anything else (Steam blocking us
+    // for too many requests, a private profile, Steam being down) is a failure, and is reported as one: answering
+    // "no achievements" would make the sync wipe the ones already saved
     if (!playerResponse.ok) {
-        response.json({ achievements: [], stats: [] });
+        const body = await playerResponse.text();
+        if (/no stats/i.test(body)) {
+            response.json({ achievements: [], stats: [] });
+            return;
+        }
+
+        const reason = /not public/i.test(body) ? "private" : "busy";
+        response.status(502).json({ error: reason });
         return;
     }
 
     const schemaResponse = await fetch("https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?" + params);
+    if (!schemaResponse.ok) {
+        response.status(502).json({ error: "busy" });
+        return;
+    }
     const playerData = await playerResponse.json();
     const schemaData = await schemaResponse.json();
     const stats = await getStats(params, schemaData);

@@ -245,6 +245,9 @@ function SettingsPage({ account, onSignOut, games, hiddenPlatforms, onTogglePlat
                 </button>
                 {syncStatus && <span>{syncStatus}</span>}
             </div>
+            <p className="stat-detail sync-note">
+                Needs Steam <strong>Game details</strong> set to <strong>Public</strong> (Edit Profile → Privacy Settings).
+            </p>
 
             <div className="button-row save-bar">
                 <button type="button" onClick={() => onUpdateProfile(draft)} disabled={!hasChanges}>

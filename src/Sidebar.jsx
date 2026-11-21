@@ -154,7 +154,7 @@ function Sidebar({ games, profile, goals, activeSession }) {
                     </div>
                 </div>
 
-                <p className="label sidebar-footer">All data stored locally</p>
+                <p className="label sidebar-footer">Saved to your Steam account</p>
             </div>
         </aside>
     );

@@ -107,7 +107,7 @@ export function addAuthRoutes(app) {
             && steamIdMatch;
 
         if (!looksRight || !(await isGenuineSteamReply(query))) {
-            response.redirect(appUrl + "/settings?signin=failed");
+            response.redirect(appUrl + "/?signin=failed");
             return;
         }
 
@@ -118,7 +118,7 @@ export function addAuthRoutes(app) {
             maxAge: thirtyDays,
             path: "/"
         });
-        response.redirect(appUrl + "/settings?signin=ok");
+        response.redirect(appUrl + "/");
     });
 
     // The app asks this on load: who's signed in? Name and picture come from the Steam profile
@@ -133,7 +133,8 @@ export function addAuthRoutes(app) {
         let avatarUrl = null;
         try {
             const params = new URLSearchParams({ key: process.env.STEAM_API_KEY, steamids: steamId });
-            const summaryResponse = await fetch("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?" + params);
+            // Steam gets 4 seconds; if it is slow you stay signed in, just without the name and picture
+            const summaryResponse = await fetch("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?" + params, { signal: AbortSignal.timeout(4000) });
             const player = (await summaryResponse.json()).response?.players?.[0];
             name = player?.personaname || null;
             avatarUrl = player?.avatarfull || null;
