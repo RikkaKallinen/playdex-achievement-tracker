@@ -1,16 +1,49 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { platformNames, accentColors, fontOptions } from "./data";
 import { cropImage } from "./resizeImage";
 import AvatarCropper from "./AvatarCropper";
+import { downloadBackup, readBackupFile } from "./backup";
+import { formatDate } from "./formatDate";
 
-function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent, fontChoice, onChangeFont, profile, onUpdateProfile, onSyncSteam, isSyncing, syncStatus }) {
+function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent, fontChoice, onChangeFont, profile, onUpdateProfile, onSyncSteam, isSyncing, syncStatus, onBuildBackup, onRestoreBackup }) {
     const [draft, setDraft] = useState(profile);
+    const [restoreStatus, setRestoreStatus] = useState("");
+    const restoreInputRef = useRef(null);
     const [cropSource, setCropSource] = useState(null);
 
     const hasChanges = JSON.stringify(draft) !== JSON.stringify(profile);
 
     function updateDraft(changes) {
         setDraft((current) => ({ ...current, ...changes }));
+    }
+
+    async function handleRestoreFile(event) {
+        const file = event.target.files[0];
+        // Clearing it lets the same file be picked again later
+        event.target.value = "";
+        if (!file) {
+            return;
+        }
+
+        try {
+            const backup = await readBackupFile(file);
+            const savedOn = backup.savedAt ? formatDate(backup.savedAt) : "an unknown date";
+            const contents = backup.games.length + " games, " + backup.goals.length + " goals, "
+                + backup.sessions.length + " sessions, " + backup.journalEntries.length + " journal entries";
+
+            if (!confirm("Replace everything in Playdex with the backup from " + savedOn + " (" + contents + ")? What's here now will be lost.")) {
+                return;
+            }
+
+            onRestoreBackup(backup);
+            // The profile form keeps its own copy, so it needs the restored profile too
+            if (backup.profile) {
+                setDraft(backup.profile);
+            }
+            setRestoreStatus("Restored the backup from " + savedOn + ".");
+        } catch (error) {
+            setRestoreStatus(error.message);
+        }
     }
 
     function addGamertag() {
@@ -242,6 +275,28 @@ function SettingsPage({ games, hiddenPlatforms, onTogglePlatform, accentColor, o
                     </p>
                 );
             })}
+
+            <h3>Backup</h3>
+            <p>
+                Your games, goals, sessions, journal and settings are only saved in this browser.
+                Download a backup before testing things out or clearing your browser data.
+            </p>
+            <div className="button-row">
+                <button type="button" onClick={() => downloadBackup(onBuildBackup())}>
+                    Download backup
+                </button>
+                <button type="button" className="button-quiet" onClick={() => restoreInputRef.current.click()}>
+                    Restore from a backup
+                </button>
+                <input
+                    ref={restoreInputRef}
+                    type="file"
+                    accept=".json,application/json"
+                    hidden
+                    onChange={handleRestoreFile}
+                />
+            </div>
+            {restoreStatus && <p className="stat-detail">{restoreStatus}</p>}
         </section>
     );
 }

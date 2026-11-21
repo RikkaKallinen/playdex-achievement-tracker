@@ -491,6 +491,37 @@ function App() {
         }));
     }
 
+    // Everything Playdex keeps in this browser, bundled into one object for Settings → Backup
+    function buildBackup() {
+        return {
+            app: "playdex",
+            version: 1,
+            savedAt: new Date().toLocaleDateString("en-CA"),
+            games: games,
+            goals: goals,
+            sessions: sessions,
+            journalEntries: journalEntries,
+            hiddenPlatforms: hiddenPlatforms,
+            accentColor: accentColor,
+            fontChoice: fontChoice,
+            profile: profile
+        };
+    }
+
+    // Replaces everything with the backup's copy. The save effects above then write it to the browser as usual
+    function restoreBackup(backup) {
+        setGames(backup.games);
+        setGoals(backup.goals);
+        setSessions(backup.sessions);
+        setJournalEntries(backup.journalEntries);
+        setHiddenPlatforms(backup.hiddenPlatforms || []);
+        setAccentColor(backup.accentColor || accentColor);
+        setFontChoice(backup.fontChoice || fontChoice);
+        if (backup.profile) {
+            setProfile(backup.profile);
+        }
+    }
+
     function togglePlatform(platform) {
         if (hiddenPlatforms.includes(platform)) {
             setHiddenPlatforms(hiddenPlatforms.filter((hiddenPlatform) => hiddenPlatform !== platform));
@@ -622,6 +653,8 @@ function App() {
                                 onSyncSteam={syncSteam}
                                 isSyncing={isSyncing}
                                 syncStatus={syncStatus}
+                                onBuildBackup={buildBackup}
+                                onRestoreBackup={restoreBackup}
                             />
                         }
                     />
