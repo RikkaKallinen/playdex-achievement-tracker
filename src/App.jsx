@@ -124,20 +124,10 @@ function App() {
         if (storage === "browser") {
             localStorage.setItem("playdex-accent", accentColor);
         }
-        // The welcome page (nobody signed in) always uses Playdex's own look: purple and the default font
+        // The welcome page (nobody signed in) always uses Playdex's own purple
         document.documentElement.dataset.accent = storage === "browser" ? "purple" : accentColor;
     }, [accentColor, storage]);
 
-    const [fontChoice, setFontChoice] = useState(() => {
-        return localStorage.getItem("playdex-font") || "default";
-    });
-
-    useEffect(() => {
-        if (storage === "browser") {
-            localStorage.setItem("playdex-font", fontChoice);
-        }
-        document.documentElement.dataset.font = storage === "browser" ? "default" : fontChoice;
-    }, [fontChoice, storage]);
 
     const [profile, setProfile] = useState(() => {
         const savedProfile = localStorage.getItem("playdex-profile");
@@ -155,7 +145,8 @@ function App() {
 
     // A brand-new profile from someone's Steam account, for fresh starts and accounts with no saved settings
     function freshProfile(me) {
-        return { name: me.name || "", avatarUrl: me.avatarUrl || "", gamertags: [], steamId: me.steamId };
+        // No avatar saved: the Steam picture shows instead, and stays current if it changes on Steam
+        return { name: me.name || "", avatarUrl: "", gamertags: [], steamId: me.steamId };
     }
 
     // Puts an account's saved parts on screen. Anything the account hasn't saved starts empty or at the default,
@@ -169,7 +160,6 @@ function App() {
         const settings = saved.settings || {};
         setHiddenPlatforms(settings.hiddenPlatforms || []);
         setAccentColor(settings.accentColor || "purple");
-        setFontChoice(settings.fontChoice || "default");
         setProfile(settings.profile ? { ...settings.profile, steamId: me.steamId } : freshProfile(me));
         setGamesLoaded(true);
     }
@@ -227,8 +217,8 @@ function App() {
 
     // The five parts saved to your account, matching the backup file. Settings bundles the smaller bits together
     const settingsPart = useMemo(
-        () => ({ hiddenPlatforms: hiddenPlatforms, accentColor: accentColor, fontChoice: fontChoice, profile: profile }),
-        [hiddenPlatforms, accentColor, fontChoice, profile]
+        () => ({ hiddenPlatforms: hiddenPlatforms, accentColor: accentColor, profile: profile }),
+        [hiddenPlatforms, accentColor, profile]
     );
     const savingToServer = storage === "server";
     useServerSave("games", games, savingToServer);
@@ -264,7 +254,7 @@ function App() {
         applySavedParts({}, me);
         setStorage("server");
         // Saving settings marks the account as set up, so this question isn't asked again next time
-        saveAllParts({ settings: { hiddenPlatforms: [], accentColor: "purple", fontChoice: "default", profile: freshProfile(me) } })
+        saveAllParts({ settings: { hiddenPlatforms: [], accentColor: "purple", profile: freshProfile(me) } })
             .catch((error) => console.error("Couldn't save your settings", error));
     }
 
@@ -678,7 +668,6 @@ function App() {
             journalEntries: journalEntries,
             hiddenPlatforms: hiddenPlatforms,
             accentColor: accentColor,
-            fontChoice: fontChoice,
             profile: profile
         };
     }
@@ -691,7 +680,6 @@ function App() {
         setJournalEntries(backup.journalEntries);
         setHiddenPlatforms(backup.hiddenPlatforms || []);
         setAccentColor(backup.accentColor || accentColor);
-        setFontChoice(backup.fontChoice || fontChoice);
         if (backup.profile) {
             setProfile(backup.profile);
         }
@@ -758,7 +746,7 @@ function App() {
 
     return (
         <div className="app-layout">
-            <Sidebar games={activeGames} profile={profile} goals={goals} activeSession={activeSession} />
+            <Sidebar games={activeGames} profile={profile} goals={goals} activeSession={activeSession} steamAvatarUrl={account && account.avatarUrl} />
 
             <main>
                 <ScrollToTop />
@@ -871,8 +859,6 @@ function App() {
                                 onTogglePlatform={togglePlatform}
                                 accentColor={accentColor}
                                 onChangeAccent={setAccentColor}
-                                fontChoice={fontChoice}
-                                onChangeFont={setFontChoice}
                                 profile={profile}
                                 onUpdateProfile={updateProfile}
                                 onSyncSteam={syncSteam}

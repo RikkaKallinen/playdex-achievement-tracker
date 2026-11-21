@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
 import { useSearchParams } from "react-router";
-import { platformNames, accentColors, fontOptions } from "./data";
+import { platformNames, accentColors } from "./data";
 import { cropImage } from "./resizeImage";
 import AvatarCropper from "./AvatarCropper";
 import { downloadBackup, readBackupFile } from "./backup";
 import { formatDate } from "./formatDate";
 
-function SettingsPage({ account, onSignOut, games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent, fontChoice, onChangeFont, profile, onUpdateProfile, onSyncSteam, isSyncing, syncStatus, onBuildBackup, onRestoreBackup }) {
+function SettingsPage({ account, onSignOut, games, hiddenPlatforms, onTogglePlatform, accentColor, onChangeAccent, profile, onUpdateProfile, onSyncSteam, isSyncing, syncStatus, onBuildBackup, onRestoreBackup }) {
     const [draft, setDraft] = useState(profile);
     // Steam sends people back to /settings?signin=ok (or =failed)
     const [searchParams] = useSearchParams();
@@ -16,6 +16,9 @@ function SettingsPage({ account, onSignOut, games, hiddenPlatforms, onTogglePlat
     const [cropSource, setCropSource] = useState(null);
 
     const hasChanges = JSON.stringify(draft) !== JSON.stringify(profile);
+    // Your own picture if you've set one, otherwise your Steam picture, otherwise your initial
+    const steamAvatarUrl = account && account.avatarUrl;
+    const shownAvatarUrl = draft.avatarUrl || steamAvatarUrl;
 
     function updateDraft(changes) {
         setDraft((current) => ({ ...current, ...changes }));
@@ -105,8 +108,8 @@ function SettingsPage({ account, onSignOut, games, hiddenPlatforms, onTogglePlat
             <h3>Profile</h3>
             <div className="profile-editor">
                 <span className="avatar avatar-large" aria-hidden="true">
-                    {draft.avatarUrl
-                        ? <img src={draft.avatarUrl} alt="" />
+                    {shownAvatarUrl
+                        ? <img src={shownAvatarUrl} alt="" />
                         : (draft.name || "Player").charAt(0).toUpperCase()}
                 </span>
                 <div className="settings-fields">
@@ -120,6 +123,9 @@ function SettingsPage({ account, onSignOut, games, hiddenPlatforms, onTogglePlat
                         onChange={(event) => updateDraft({ name: event.target.value })}
                     />
                     <label htmlFor="profile-avatar-file">Avatar image (optional)</label>
+                    {!draft.avatarUrl && steamAvatarUrl && (
+                        <p className="field-hint">Using your Steam picture. Choose an image to use your own instead.</p>
+                    )}
                     <input
                         type="file"
                         id="profile-avatar-file"
@@ -140,7 +146,7 @@ function SettingsPage({ account, onSignOut, games, hiddenPlatforms, onTogglePlat
                             className="button-quiet"
                             onClick={() => updateDraft({ avatarUrl: "" })}
                         >
-                            Remove avatar
+                            {steamAvatarUrl ? "Use my Steam picture" : "Remove avatar"}
                         </button>
                     )}
                 </div>
@@ -270,20 +276,6 @@ function SettingsPage({ account, onSignOut, games, hiddenPlatforms, onTogglePlat
                     >
                         <span className="swatch" data-accent={color} />
                         {accentColors[color]}
-                    </button>
-                ))}
-            </p>
-            <h3>Font</h3>
-            <p>
-                {Object.keys(fontOptions).map((font) => (
-                    <button
-                        key={font}
-                        type="button"
-                        data-font={font}
-                        className={font === fontChoice ? "swatch-button font-preview selected" : "swatch-button font-preview"}
-                        onClick={() => onChangeFont(font)}
-                    >
-                        {fontOptions[font]}
                     </button>
                 ))}
             </p>

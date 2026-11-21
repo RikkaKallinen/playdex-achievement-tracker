@@ -20,16 +20,6 @@
 [data-accent="pink"] { --accent: #f472b6; }
 [data-accent="red"] { --accent: #ef4444; }
 
-[data-font="default"] {
-    --font-heading: "Space Grotesk", system-ui, sans-serif;
-    --font-body: "Inter", system-ui, sans-serif;
-}
-
-[data-font="dyslexic"] {
-    --font-heading: "OpenDyslexic", sans-serif;
-    --font-body: "OpenDyslexic", sans-serif;
-}
-
 body {
     font-family: var(--font-body);
     font-variant-numeric: tabular-nums;
@@ -1631,10 +1621,6 @@ details summary {
     vertical-align: -2px;
     border-radius: 50%;
     background: var(--accent);
-}
-
-.font-preview {
-    font-family: var(--font-body);
 }
 
 /* Tile Stats */

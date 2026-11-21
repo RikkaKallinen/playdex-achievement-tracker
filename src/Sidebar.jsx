@@ -15,7 +15,10 @@ const navLinks = [
     { to: "/settings", label: "Settings", Icon: Settings }
 ];
 
-function Sidebar({ games, profile, goals, activeSession }) {
+// steamAvatarUrl: the signed-in Steam account's picture, shown whenever you haven't set your own
+function Sidebar({ games, profile, goals, activeSession, steamAvatarUrl }) {
+    const avatarUrl = profile.avatarUrl || steamAvatarUrl;
+
     const navigate = useNavigate();
     // Re-render on every page change so the nav highlight can follow the active link
     useLocation();
@@ -122,8 +125,8 @@ function Sidebar({ games, profile, goals, activeSession }) {
             <div className="sidebar-bottom">
                 <div className="sidebar-profile">
                     <span className="avatar" aria-hidden="true">
-                        {profile.avatarUrl
-                            ? <img src={profile.avatarUrl} alt="" />
+                        {avatarUrl
+                            ? <img src={avatarUrl} alt="" />
                             : (profile.name || "Player").charAt(0).toUpperCase()}
                     </span>
                     <div className="profile-text">
