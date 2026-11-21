@@ -1,11 +1,14 @@
 import express from "express";
 import { findProgressStat, findTargetInDescription } from "../src/progressMatch.js";
 import { addAuthRoutes } from "./auth.js";
+import { addDataRoutes } from "./data.js";
 
 const app = express();
-const port = 3001;
+// Hosting services pick the port themselves through PORT; on this computer it stays 3001
+const port = process.env.PORT || 3001;
 
 addAuthRoutes(app);
+addDataRoutes(app);
 
 async function findCoverUrl(appId) {
     const simpleUrl = "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/header.jpg";

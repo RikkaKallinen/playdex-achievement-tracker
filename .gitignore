@@ -28,3 +28,6 @@ PLAN.md
 
 # Secrets (Steam API key)
 .env
+
+# Prisma client, rebuilt by "npx prisma generate"
+server/generated

@@ -1,0 +1,23 @@
+// Playdex's database layout. After changing it, run: npx prisma migrate dev --name what-changed
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../server/generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// One saved part of one person's Playdex, labelled by their Steam ID.
+// part is "games", "goals", "sessions", "journalEntries" or "settings"; data is that part exactly as the app keeps it
+// (the same shape as in a backup file). Each person has at most one row per part.
+model SavedPart {
+  steamId   String
+  part      String
+  data      Json
+  updatedAt DateTime @updatedAt
+
+  @@id([steamId, part])
+}
