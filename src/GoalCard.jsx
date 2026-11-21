@@ -7,7 +7,12 @@ import { formatDate } from "./formatDate";
 // preview: a look-only copy for the goal form (no edit/delete buttons, progress and checkbox switched off)
 function GoalCard({ goal, games, goals, showGame = true, preview = false, onToggle, onDelete, onProgressChange, onSave }) {
     const [isEditing, setIsEditing] = useState(false);
-    const { game, completed, completedDate } = getGoalStatus(goal, games);
+    const { game, achievement, completed, completedDate } = getGoalStatus(goal, games);
+
+    // Achievement goals borrow the achievement's Steam counter, but only where sync already linked one (e.g. 15 / 20 rabbits)
+    const steamProgress = achievement && !achievement.earned && achievement.progressStat && achievement.progressTarget > 0
+        ? { value: achievement.progressValue || 0, target: achievement.progressTarget }
+        : null;
 
     if (isEditing) {
         return (
@@ -69,6 +74,17 @@ function GoalCard({ goal, games, goals, showGame = true, preview = false, onTogg
                 ) : (
                     "Not completed yet"
                 )}
+                {steamProgress && (
+                    <span className="achievement-progress">
+                        <span className="stat-bar">
+                            <span
+                                className="stat-bar-fill"
+                                style={{ width: Math.min(100, Math.round((steamProgress.value / steamProgress.target) * 100)) + "%" }}
+                            />
+                        </span>
+                        {steamProgress.value} / {steamProgress.target}
+                    </span>
+                )}
             </p>
 
             <div className="goal-actions">
@@ -86,6 +102,9 @@ function GoalCard({ goal, games, goals, showGame = true, preview = false, onTogg
                         {" "}/ {goal.target}
                         <progress value={goal.progress} max={goal.target} />
                     </label>
+                ) : achievement && achievement.source === "steam" ? (
+                    // Steam decides when a synced achievement unlocks, so there's nothing to tick here
+                    <span className="synced-note">Synced from Steam</span>
                 ) : (
                     <label>
                         <input type="checkbox" checked={completed} disabled={preview} onChange={onToggle} />

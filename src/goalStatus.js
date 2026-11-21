@@ -7,6 +7,7 @@ export function getGoalStatus(goal, games) {
 
     return {
         game: game,
+        achievement: achievement,
         completed: achievement ? achievement.earned : goal.completed,
         completedDate: achievement ? achievement.earnedDate : goal.completedDate
     };

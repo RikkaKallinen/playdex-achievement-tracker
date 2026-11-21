@@ -1006,6 +1006,13 @@ main {
     margin-bottom: 0;
 }
 
+/* The preview column is narrow, so the pills go under the title instead of squeezing it */
+.goal-preview .goal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
 @media (max-width: 900px) {
     .goal-form-layout {
         grid-template-columns: 1fr;
