@@ -1,7 +1,11 @@
+import { existsSync } from "node:fs";
 import { defineConfig } from "prisma/config";
 
-// Prisma 7 doesn't read .env by itself, so load it here (Node's built-in loader, no extra package)
-process.loadEnvFile();
+// Prisma 7 doesn't read .env by itself, so load it here (Node's built-in loader, no extra package).
+// Online there's no .env file: the host passes the same values in as environment variables instead
+if (existsSync(".env")) {
+    process.loadEnvFile();
+}
 
 export default defineConfig({
     schema: "prisma/schema.prisma",
