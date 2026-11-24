@@ -2,6 +2,8 @@
 
 Track it. Log it. Beat it.
 
+**Live site:** https://playdex-tracker.onrender.com (it's on a free plan, so the first visit can take up to a minute to wake up)
+
 Playdex is a gaming tracker I built. You sign in with Steam, it pulls in your games and achievements, and then you can set goals, time your play sessions and keep a journal.
 
 ## What it does
