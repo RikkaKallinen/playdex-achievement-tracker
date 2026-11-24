@@ -240,6 +240,14 @@ app.get("/api/steam/genres", async (request, response) => {
     response.json(genres);
 });
 
+// Online, this one server also hands out the built website (npm run build makes the dist folder).
+// Any address that isn't a file or an /api route gets index.html, so React's router can show the right page
+const distFolder = new URL("../dist", import.meta.url).pathname;
+app.use(express.static(distFolder));
+app.get("/{*page}", (request, response) => {
+    response.sendFile("index.html", { root: distFolder });
+});
+
 app.listen(port, () => {
     console.log("Playdex server running on http://localhost:" + port);
 });
